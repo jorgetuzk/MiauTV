@@ -301,6 +301,23 @@ export const useUpdateFile = () => {
     });
 };
 
+export const useUploadThumbnail = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, blob }: { id: number; blob: Blob }) => {
+            const formData = new FormData();
+            formData.append('cover', blob, 'cover.jpg');
+            const { data } = await api.post<TelegramFile>(`/files/${id}/thumbnail`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['files'] });
+        },
+    });
+};
+
 export const useDeleteFile = () => {
     const queryClient = useQueryClient();
     return useMutation({
