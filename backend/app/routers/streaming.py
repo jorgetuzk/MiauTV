@@ -92,7 +92,7 @@ async def stream_file(
     
     # Determine content disposition
     mime_type = file.mime_type or "application/octet-stream"
-    disposition = "attachment" if download else ("inline" if ("video/" in mime_type or "audio/" in mime_type) else "attachment")
+    disposition = "attachment" if download else ("inline" if ("video/" in mime_type or "audio/" in mime_type or "image/" in mime_type) else "attachment")
     
     from urllib.parse import quote
     encoded_filename = quote(file.file_name)
@@ -144,7 +144,10 @@ async def get_thumbnail(
         elif message.audio and message.audio.thumbs:
             thumbnail = message.audio.thumbs[0]
         elif message.photo:
-            thumbnail = message.photo[-1]  # Use best quality photo
+            # Use the smallest available size as the thumbnail (falls back to
+            # the only size available for single-size photos).
+            sizes = message.photo.sizes
+            thumbnail = sizes[0] if sizes else None
             
         if not thumbnail:
             # Try using the file_id directly if stored (fallback)
@@ -218,7 +221,7 @@ async def stream_public_file(
     
     # Determine content disposition
     mime_type = file.mime_type or "application/octet-stream"
-    disposition = "attachment" if download else ("inline" if ("video/" in mime_type or "audio/" in mime_type) else "attachment")
+    disposition = "attachment" if download else ("inline" if ("video/" in mime_type or "audio/" in mime_type or "image/" in mime_type) else "attachment")
     
     from urllib.parse import quote
     encoded_filename = quote(file.file_name)

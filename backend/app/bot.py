@@ -270,7 +270,7 @@ async def myfiles_command(client, message: Message):
     if not files:
         await message.reply(
             "📭 You haven't uploaded any files yet.\n\n"
-            "Send me a video, audio, or document to get started!"
+            "Send me a video, audio, photo, or document to get started!"
         )
         return
     
@@ -520,28 +520,45 @@ async def handle_file(client, message: Message):
         media = message.document
         file_type = "document"
     elif message.photo:
-        return await message.reply("❌ Photos are not supported yet.")
+        # message.photo.sizes is a list of available resolutions, sorted
+        # ascending by size — the last entry is the highest resolution.
+        media = message.photo.sizes[-1]
+        file_type = "image"
     else:
         return
-    
+
     status_msg = await message.reply("📥 Processing file...")
-    
+
     try:
         # Forward to storage channel
         forwarded = await forward_to_storage_channel(message)
-        
+
         # Extract file info
-        raw_filename = getattr(media, "file_name", None) or f"{file_type}_{message.id}"
+        if file_type == "image":
+            # Photo sizes have no file_name/mime_type of their own, and no
+            # separate .thumbs — use a smaller size as the thumbnail when
+            # available.
+            raw_filename = f"photo_{message.id}.jpg"
+            mime_type = "image/jpeg"
+            photo_sizes = message.photo.sizes
+            thumbnail_file_id = (
+                photo_sizes[0].file_id if len(photo_sizes) > 1 else media.file_id
+            )
+        else:
+            raw_filename = getattr(media, "file_name", None) or f"{file_type}_{message.id}"
+            mime_type = getattr(media, "mime_type", None)
+            thumbnail_file_id = media.thumbs[0].file_id if getattr(media, "thumbs", None) else None
+
         file_info = {
             "file_id": media.file_id,
             "file_unique_id": media.file_unique_id,
             "file_name": sanitize_filename(raw_filename),
             "file_size": media.file_size,
-            "mime_type": getattr(media, "mime_type", None),
+            "mime_type": mime_type,
             "duration": getattr(media, "duration", None),
             "width": getattr(media, "width", None),
             "height": getattr(media, "height", None),
-            "thumbnail_file_id": media.thumbs[0].file_id if getattr(media, "thumbs", None) else None,
+            "thumbnail_file_id": thumbnail_file_id,
         }
         
         # Save to database
@@ -558,18 +575,22 @@ async def handle_file(client, message: Message):
         
         # Build response
         emoji = {"video": "🎬", "audio": "🎵", "document": "📄", "image": "🖼"}.get(file_type, "📎")
-        
+        saved_label = {"video": "Video", "audio": "Audio", "document": "File", "image": "Photo"}.get(file_type, "File")
+
         response = (
-            f"✅ **File saved!**\n\n"
+            f"✅ **{saved_label} saved!**\n\n"
             f"{emoji} **{file_info['file_name']}**\n"
             f"🆔 File ID: `{file.id}`\n"
             f"📦 Size: {format_size(file_info['file_size'])}\n"
             f"🎭 Type: {file_type}\n"
         )
-        
+
         if file_info['duration']:
             response += f"⏱ Duration: {format_duration(file_info['duration'])}\n"
-        
+
+        if file_info['width'] and file_info['height']:
+            response += f"📐 Resolution: {file_info['width']}x{file_info['height']}\n"
+
         response += f"\n📁 Folder: / (root)\n\n"
         response += f"💡 Use `/file {file.id}` to manage this file"
         
@@ -651,7 +672,7 @@ async def handle_callback(client, callback: CallbackQuery):
         if not files:
             await callback.message.reply(
                 "📭 You haven't uploaded any files yet.\n\n"
-                "Send me a video, audio, or document to get started!"
+                "Send me a video, audio, photo, or document to get started!"
             )
             await callback.answer()
             return

@@ -56,7 +56,7 @@ async def parallel_stream_generator(
     async def fetch_msg(client, idx):
         try:
             msg = await client.get_messages(chat_id, message_id)
-            if msg and (msg.document or msg.video or msg.audio):
+            if msg and (msg.document or msg.video or msg.audio or msg.photo):
                 return (idx, msg)
             else:
                 logger.warning("Bot %d: message %d has no media", idx, message_id)
