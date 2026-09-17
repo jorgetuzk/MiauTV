@@ -74,6 +74,10 @@ class File(Base):
     width: Mapped[Optional[int]] = mapped_column(Integer)
     height: Mapped[Optional[int]] = mapped_column(Integer)
     thumbnail_file_id: Mapped[Optional[str]] = mapped_column(String(255))
+    # User-uploaded cover, takes priority over thumbnail_file_id when set.
+    # Stored the same way as any other Telegram-hosted media: a photo message
+    # in the storage channel, referenced by its file_id.
+    custom_thumbnail_file_id: Mapped[Optional[str]] = mapped_column(String(255))
     
     # Sharing
     public_hash: Mapped[Optional[str]] = mapped_column(String(64), unique=True, index=True)

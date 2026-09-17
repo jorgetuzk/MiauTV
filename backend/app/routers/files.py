@@ -1,26 +1,36 @@
 """
 File management API endpoints.
 """
+import io
+import logging
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
+from fastapi import File as UploadFileParam
 import secrets
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, delete
 from sqlalchemy.orm import selectinload
+from pyrogram.types import InputMediaPhoto
 
 from ..database import get_db
 from ..models import File, User, WatchProgress
 from ..schemas import FileResponse, FileListResponse, FileUpdate, WatchProgressUpdate
 from ..auth import get_current_user
+from .. import telegram
 from ..telegram import delete_from_storage_channel
 from ..config import get_settings
 from ..services import (
-    escape_like, 
-    sanitize_filename, 
-    add_urls_to_file, 
-    fetch_recent_files, 
+    escape_like,
+    sanitize_filename,
+    add_urls_to_file,
+    fetch_recent_files,
     fetch_continue_watching_files
 )
+
+logger = logging.getLogger(__name__)
+
+ALLOWED_COVER_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_COVER_SIZE = 5 * 1024 * 1024  # 5 MB — the frontend crops/compresses before upload
 
 router = APIRouter(prefix="/files", tags=["Files"])
 settings = get_settings()
@@ -350,6 +360,57 @@ async def revoke_share(
     file = result.scalar_one()
     
     return FileResponse(**add_urls_to_file(file))
+
+
+@router.post("/{file_id}/thumbnail", response_model=FileResponse)
+async def upload_custom_thumbnail(
+    file_id: int,
+    cover: UploadFile = UploadFileParam(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Upload a user-cropped cover image, replacing the file's thumbnail."""
+    result = await db.execute(
+        select(File).where(File.id == file_id, File.user_id == current_user.id).options(selectinload(File.watch_progress))
+    )
+    file = result.scalar_one_or_none()
+
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    if cover.content_type not in ALLOWED_COVER_TYPES:
+        raise HTTPException(status_code=400, detail="Unsupported image type")
+
+    contents = await cover.read()
+    if len(contents) > MAX_COVER_SIZE:
+        raise HTTPException(status_code=400, detail="Image too large (max 5MB)")
+
+    # Store the cover the same way every other file is stored: as a message
+    # in the Telegram storage channel, referenced by its file_id.
+    buf = io.BytesIO(contents)
+    buf.name = f"cover_{file_id}.jpg"
+    try:
+        sent = await telegram.tg_client.send_photo(
+            settings.telegram_storage_channel_id,
+            InputMediaPhoto(buf),
+        )
+    except Exception as e:
+        logger.error(f"Failed to upload custom thumbnail for file {file_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to upload cover image")
+
+    file.custom_thumbnail_file_id = sent.photo.sizes[-1].file_id
+
+    await db.commit()
+
+    # Re-fetch with relationships
+    result = await db.execute(
+        select(File).where(File.id == file_id).options(selectinload(File.watch_progress))
+    )
+    file = result.scalar_one()
+
+    return FileResponse(**add_urls_to_file(file))
+
+
 @router.post("/batch-move")
 async def batch_move_files(
     move_data: dict,

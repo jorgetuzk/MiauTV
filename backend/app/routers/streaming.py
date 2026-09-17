@@ -126,9 +126,19 @@ async def get_thumbnail(
     )
     file = result.scalar_one_or_none()
     
-    if not file or not file.thumbnail_file_id:
+    if not file or not (file.thumbnail_file_id or file.custom_thumbnail_file_id):
         raise HTTPException(status_code=404, detail="Thumbnail not found")
-    
+
+    # A user-uploaded cover always wins over the auto-derived one, and is a
+    # plain file_id download — no need to touch the original message at all.
+    if file.custom_thumbnail_file_id:
+        try:
+            thumb_bytes = await telegram.tg_client.download_media(file.custom_thumbnail_file_id, in_memory=True)
+            return Response(content=thumb_bytes.getvalue(), media_type="image/jpeg")
+        except Exception as e:
+            logger.error(f"Custom thumbnail error for file {file_id}: {e}")
+            raise HTTPException(status_code=500, detail="Failed to get thumbnail")
+
     try:
         # Get the message and download thumbnail
         message = await get_message_from_channel(file.channel_message_id)

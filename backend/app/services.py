@@ -41,6 +41,11 @@ def sanitize_filename(name: str) -> str:
 
 def add_urls_to_file(file: File) -> dict:
     """Add stream and thumbnail URLs to file response."""
+    has_thumbnail = bool(file.thumbnail_file_id or file.custom_thumbnail_file_id)
+    # Cache-bust on updated_at so browsers pick up a newly-changed cover
+    # immediately instead of serving a cached image at the same URL.
+    thumbnail_version = int(file.updated_at.timestamp()) if file.updated_at else 0
+
     data = {
         "id": file.id,
         "user_id": file.user_id,
@@ -57,7 +62,7 @@ def add_urls_to_file(file: File) -> dict:
         "created_at": file.created_at,
         "updated_at": file.updated_at,
         "stream_url": f"/api/stream/{file.id}",
-        "thumbnail_url": f"/api/stream/{file.id}/thumbnail" if file.thumbnail_file_id else None,
+        "thumbnail_url": f"/api/stream/{file.id}/thumbnail?v={thumbnail_version}" if has_thumbnail else None,
         "last_pos": file.watch_progress[0].position if file.watch_progress else 0,
     }
     
