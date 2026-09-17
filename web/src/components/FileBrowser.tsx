@@ -13,6 +13,7 @@ import DeleteConfirmModal from './DeleteConfirmModal';
 import RenameModal from './RenameModal';
 import Sidebar from './Sidebar';
 import Toasts from './Toasts';
+import ImageViewer from './ImageViewer';
 
 export default function FileBrowser() {
     const {
@@ -30,6 +31,8 @@ export default function FileBrowser() {
         setViewMode,
         previewFile,
         setPreviewFile,
+        previewImage,
+        setPreviewImage,
         showNewFolder,
         setShowNewFolder,
         moveItems,
@@ -324,14 +327,10 @@ export default function FileBrowser() {
     const handleFileOpen = (file: TelegramFile) => {
         if (file.file_type === 'video' || file.file_type === 'audio') {
             setPreviewFile(file);
-        } else {
-            // For now, do nothing or show a toast
-            // Maybe implement lightbox for images later
-            if (file.file_type === 'image') {
-                 // Future: Lightbox
-            }
-            // Prevent opening empty player
+        } else if (file.file_type === 'image') {
+            setPreviewImage(file);
         }
+        // Documents have no in-app viewer yet — double-click does nothing.
     };
 
     // Keyboard shortcuts
@@ -356,7 +355,8 @@ export default function FileBrowser() {
 
             // Escape - close modals or clear selection
             if (e.key === 'Escape') {
-                if (previewFile) setPreviewFile(null);
+                if (previewImage) setPreviewImage(null);
+                else if (previewFile) setPreviewFile(null);
                 else if (showNewFolder) setShowNewFolder(false);
                 else if (moveItems) setMoveItems(null);
                 else if (deleteConfirm) setDeleteConfirm(null);
@@ -424,10 +424,10 @@ export default function FileBrowser() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [
-        previewFile, showNewFolder, moveItems, deleteConfirm,
+        previewFile, previewImage, showNewFolder, moveItems, deleteConfirm,
         selectedFileIds, displayFiles, breadcrumbs, clipboard,
         currentFolderId, handlePaste, handleRefresh,
-        setPreviewFile, setShowNewFolder, setMoveItems, setDeleteConfirm,
+        setPreviewFile, setPreviewImage, setShowNewFolder, setMoveItems, setDeleteConfirm,
         clearSelection, selectAll, setRenameFile, navigateToBreadcrumb, setClipboard, folders
     ]);
 
@@ -708,6 +708,15 @@ export default function FileBrowser() {
             </main>
 
             <Toasts />
+
+            {previewImage && (
+                <ImageViewer
+                    file={previewImage}
+                    images={(displayFiles || []).filter((f) => f.file_type === 'image')}
+                    onClose={() => setPreviewImage(null)}
+                    onNavigate={(f) => setPreviewImage(f)}
+                />
+            )}
 
             {/* Modals */}
             {showNewFolder && (

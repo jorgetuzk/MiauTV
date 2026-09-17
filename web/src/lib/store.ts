@@ -31,6 +31,9 @@ interface AppState {
     previewFile: TelegramFile | null;
     setPreviewFile: (file: TelegramFile | null) => void;
 
+    previewImage: TelegramFile | null;
+    setPreviewImage: (file: TelegramFile | null) => void;
+
     renameFile: TelegramFile | null;
     setRenameFile: (file: TelegramFile | null) => void;
 
@@ -139,7 +142,19 @@ export const useAppStore = create<AppState>((set) => ({
 
     // Modals
     previewFile: null,
-    setPreviewFile: (file) => set({ previewFile: file }),
+    // Opening the media player closes the image viewer (both are full-screen overlays).
+    setPreviewFile: (file) => set((state) => ({
+        previewFile: file,
+        previewImage: file ? null : state.previewImage,
+    })),
+
+    previewImage: null,
+    // Opening the image viewer closes the media player, unless it's minimized
+    // (a small bar) — in that case both can coexist on screen.
+    setPreviewImage: (file) => set((state) => ({
+        previewImage: file,
+        previewFile: (file && !state.isPlayerMinimized) ? null : state.previewFile,
+    })),
 
     renameFile: null,
     setRenameFile: (file) => set({ renameFile: file }),
