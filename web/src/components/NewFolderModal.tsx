@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { X, FolderPlus } from 'lucide-react';
 import { useCreateFolder } from '../lib/api';
+import { setLastUsedFolder } from '../lib/lastUsedFolder';
 
 interface NewFolderModalProps {
     parentId: number | null;
@@ -18,10 +19,11 @@ export default function NewFolderModal({ parentId, onClose }: NewFolderModalProp
         e.preventDefault();
         if (!name.trim()) return;
 
-        await createFolder.mutateAsync({
+        const folder = await createFolder.mutateAsync({
             name: name.trim(),
             parent_id: parentId,
         });
+        setLastUsedFolder({ id: folder.id, name: folder.name });
         onClose();
     };
 

@@ -2,9 +2,10 @@
  * MoveFileModal - modal for selecting a destination folder
  */
 import { useState, useEffect, useMemo } from 'react';
-import { X, Folder as FolderIcon, ChevronRight, Home, Search } from 'lucide-react';
+import { X, Folder as FolderIcon, ChevronRight, Home, Search, Clock } from 'lucide-react';
 import { useFolderTree, TelegramFile, Folder, useMoveFiles, useMoveFolders } from '../lib/api';
 import { useAppStore } from '../lib/store';
+import { getLastUsedFolder, setLastUsedFolder } from '../lib/lastUsedFolder';
 
 interface MoveFileModalProps {
     items: { files: TelegramFile[]; folders: Folder[] };
@@ -30,7 +31,7 @@ function flattenTree(folders: Folder[], depth = 0): FlatFolder[] {
 }
 
 export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
-    const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [selected, setSelected] = useState<{ id: number | null; name: string }>({ id: null, name: 'Raiz (Sem pasta)' });
     const [searchInput, setSearchInput] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const { data: folderTree, isLoading } = useFolderTree();
@@ -40,6 +41,7 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
 
     const isPending = isFilesPending || isFoldersPending;
     const totalItems = items.files.length + items.folders.length;
+    const movingFolderIds = useMemo(() => items.folders.map((f) => f.id), [items.folders]);
 
     // Debounce the search input a little so we don't re-filter on every keystroke.
     useEffect(() => {
@@ -54,23 +56,33 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
         return flatFolders.filter((f) => f.name.toLowerCase().includes(debouncedSearch));
     }, [flatFolders, debouncedSearch]);
 
+    // "Last used folder" shortcut — only offered if it isn't one of the items
+    // currently being moved, and (when we know the tree) still exists.
+    const lastUsedFolder = useMemo(() => {
+        const last = getLastUsedFolder();
+        if (!last) return null;
+        if (last.id !== null && movingFolderIds.includes(last.id)) return null;
+        if (last.id !== null && folderTree && !flatFolders.some((f) => f.id === last.id)) return null;
+        return last;
+    }, [movingFolderIds, folderTree, flatFolders]);
+
     const handleMove = async () => {
         try {
             const promises = [];
             if (items.files.length > 0) {
-                promises.push(moveFiles({ ids: items.files.map(f => f.id), folderId: selectedId }));
+                promises.push(moveFiles({ ids: items.files.map(f => f.id), folderId: selected.id }));
             }
             if (items.folders.length > 0) {
                 // Prevent moving folder into itself
-                const folderIds = items.folders.map(f => f.id);
-                if (selectedId && folderIds.includes(selectedId)) {
+                if (selected.id && movingFolderIds.includes(selected.id)) {
                     addToast('Não é possível mover uma pasta para dentro dela mesma', 'error');
                     return;
                 }
-                promises.push(moveFolders({ ids: folderIds, folderId: selectedId }));
+                promises.push(moveFolders({ ids: movingFolderIds, folderId: selected.id }));
             }
 
             await Promise.all(promises);
+            setLastUsedFolder(selected);
             addToast(`${totalItems} item(ns) movido(s) com sucesso`);
             clearSelection();
             onClose();
@@ -93,6 +105,20 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                     Selecione a pasta de destino
                 </p>
 
+                {lastUsedFolder && (
+                    <button
+                        onClick={() => setSelected(lastUsedFolder)}
+                        className={`w-full flex items-center gap-2 px-3 py-2 mb-3 rounded-lg border text-sm transition-colors ${
+                            selected.id === lastUsedFolder.id
+                                ? 'bg-primary-600/20 border-primary-500/40 text-primary-300'
+                                : 'bg-dark-800/60 border-white/[0.06] text-dark-300 hover:bg-dark-700'
+                        }`}
+                    >
+                        <Clock className="w-4 h-4 shrink-0" />
+                        <span className="truncate">Última pasta: <span className="font-medium">{lastUsedFolder.name}</span></span>
+                    </button>
+                )}
+
                 <div className="relative mb-3">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
                     <input
@@ -110,8 +136,8 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                             searchResults.map((folder) => (
                                 <button
                                     key={folder.id}
-                                    onClick={() => setSelectedId(folder.id)}
-                                    className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-dark-700 transition-colors ${selectedId === folder.id ? 'bg-primary-600/20 text-primary-400' : ''
+                                    onClick={() => setSelected({ id: folder.id, name: folder.name })}
+                                    className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-dark-700 transition-colors ${selected.id === folder.id ? 'bg-primary-600/20 text-primary-400' : ''
                                         }`}
                                 >
                                     <FolderIcon className="w-4 h-4 text-primary-400 shrink-0" />
@@ -126,8 +152,8 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                         <>
                             {/* Root option */}
                             <button
-                                onClick={() => setSelectedId(null)}
-                                className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-dark-700 transition-colors ${selectedId === null ? 'bg-primary-600/20 text-primary-400' : ''
+                                onClick={() => setSelected({ id: null, name: 'Raiz (Sem pasta)' })}
+                                className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-dark-700 transition-colors ${selected.id === null ? 'bg-primary-600/20 text-primary-400' : ''
                                     }`}
                             >
                                 <Home className="w-4 h-4" />
@@ -141,8 +167,8 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                                     <FolderTreeItem
                                         key={folder.id}
                                         folder={folder}
-                                        selectedId={selectedId}
-                                        onSelect={setSelectedId}
+                                        selectedId={selected.id}
+                                        onSelect={(id, name) => setSelected({ id, name })}
                                         depth={0}
                                     />
                                 ))
@@ -181,7 +207,7 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
 function FolderTreeItem({ folder, selectedId, onSelect, depth }: {
     folder: Folder;
     selectedId: number | null;
-    onSelect: (id: number) => void;
+    onSelect: (id: number, name: string) => void;
     depth: number;
 }) {
     const [expanded, setExpanded] = useState(true);
@@ -190,7 +216,7 @@ function FolderTreeItem({ folder, selectedId, onSelect, depth }: {
     return (
         <div>
             <button
-                onClick={() => onSelect(folder.id)}
+                onClick={() => onSelect(folder.id, folder.name)}
                 className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-dark-700 transition-colors ${selectedId === folder.id ? 'bg-primary-600/20 text-primary-400' : ''
                     }`}
                 style={{ paddingLeft: `${16 + depth * 16}px` }}
