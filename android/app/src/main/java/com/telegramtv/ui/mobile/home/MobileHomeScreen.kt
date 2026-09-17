@@ -156,7 +156,7 @@ fun MobileHomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (uiState.currentFolderId == null) "Meus Arquivos" else uiState.currentFolderName,
+                        text = if (uiState.currentFolderId == null) "Mochila" else uiState.currentFolderName,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold

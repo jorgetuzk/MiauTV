@@ -89,12 +89,12 @@ export const useAppStore = create<AppState>((set) => ({
     setCurrentFolderId: (id) => set({ currentFolderId: id }),
 
     // Breadcrumbs
-    breadcrumbs: [{ id: null, name: 'Meus Arquivos' }],
+    breadcrumbs: [{ id: null, name: 'Mochila' }],
     setBreadcrumbs: (breadcrumbs) => set({ breadcrumbs }),
 
     // Navigation Section
     activeSection: 'files',
-    setActiveSection: (section) => set({ activeSection: section, currentFolderId: null, breadcrumbs: [{ id: null, name: section === 'files' ? 'Meus Arquivos' : section === 'recent' ? 'Add Recente' : 'Voltar a Ver' }] }),
+    setActiveSection: (section) => set({ activeSection: section, currentFolderId: null, breadcrumbs: [{ id: null, name: section === 'files' ? 'Mochila' : section === 'recent' ? 'Add Recente' : 'Voltar a Ver' }] }),
 
     // Selection
     selectedFileIds: new Set(),

@@ -147,7 +147,7 @@ export default function FileBrowser() {
     const navigateToFolder = useCallback((folder: Folder | null) => {
         if (folder === null) {
             setCurrentFolderId(null);
-            setBreadcrumbs([{ id: null, name: 'Meus Arquivos' }]);
+            setBreadcrumbs([{ id: null, name: 'Mochila' }]);
         } else {
             setCurrentFolderId(folder.id);
             setBreadcrumbs([...breadcrumbs, { id: folder.id, name: folder.name }]);

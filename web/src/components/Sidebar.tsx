@@ -91,7 +91,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                 {/* Navigation */}
                 <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-                    <NavItem section="files" icon={Files} label="Meus Arquivos" />
+                    <NavItem section="files" icon={Files} label="Mochila" />
                     <NavItem section="recent" icon={Clock} label="Add Recente" />
                     <NavItem section="continue_watching" icon={PlayCircle} label="Voltar a Ver" />
                 </nav>
