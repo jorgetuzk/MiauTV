@@ -11,6 +11,7 @@ import NewFolderModal from './NewFolderModal';
 import MoveFileModal from './MoveFileModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import RenameModal from './RenameModal';
+import ChangeCoverModal from './ChangeCoverModal';
 import Sidebar from './Sidebar';
 import Toasts from './Toasts';
 import ImageViewer from './ImageViewer';
@@ -45,6 +46,8 @@ export default function FileBrowser() {
         setFileTypeFilter,
         renameFile,
         setRenameFile,
+        changeCoverFile,
+        setChangeCoverFile,
         renameFolder,
         setRenameFolder,
         clipboard,
@@ -832,6 +835,19 @@ export default function FileBrowser() {
                 currentName={renameFolder?.name || ''}
                 itemType="folder"
             />
+
+            {changeCoverFile && (
+                <ChangeCoverModal
+                    file={changeCoverFile}
+                    onClose={() => setChangeCoverFile(null)}
+                    onChanged={(updated) => {
+                        // Patch the file in place so the new cover shows up right
+                        // away — invalidating the query alone wouldn't update an
+                        // entry already merged into the locally accumulated page list.
+                        setAllFiles((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+                    }}
+                />
+            )}
         </div>
     );
 }

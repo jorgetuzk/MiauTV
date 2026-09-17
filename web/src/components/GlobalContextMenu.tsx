@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '../lib/store';
 import { TelegramFile, Folder, api } from '../lib/api';
-import { Play, Download, Link, Edit, FolderInput, Trash2, Globe, ShieldOff, HardDriveDownload } from 'lucide-react';
+import { Play, Download, Link, Edit, FolderInput, Trash2, Globe, ShieldOff, HardDriveDownload, ImagePlus } from 'lucide-react';
 
 export default function GlobalContextMenu() {
-    const { activeContextMenu, setActiveContextMenu, setPreviewFile, setMoveItems, setMoveFiles, setDeleteConfirm, setRenameFile, setRenameFolder, selectedFileIds, selectedFiles } = useAppStore();
+    const { activeContextMenu, setActiveContextMenu, setPreviewFile, setMoveItems, setMoveFiles, setDeleteConfirm, setRenameFile, setRenameFolder, setChangeCoverFile, selectedFileIds, selectedFiles } = useAppStore();
     const menuRef = useRef<HTMLDivElement>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -231,6 +231,10 @@ export default function GlobalContextMenu() {
                                 <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => setRenameFile(activeContextMenu.item as TelegramFile))}>
                                     <Edit className="w-4 h-4" />
                                     Renomear
+                                </button>
+                                <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => setChangeCoverFile(activeContextMenu.item as TelegramFile))}>
+                                    <ImagePlus className="w-4 h-4" />
+                                    Alterar capa
                                 </button>
                                 <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => setMoveItems({ files: [activeContextMenu.item as TelegramFile], folders: [] }))}>
                                     <FolderInput className="w-4 h-4" />

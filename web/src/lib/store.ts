@@ -37,6 +37,9 @@ interface AppState {
     renameFile: TelegramFile | null;
     setRenameFile: (file: TelegramFile | null) => void;
 
+    changeCoverFile: TelegramFile | null;
+    setChangeCoverFile: (file: TelegramFile | null) => void;
+
     renameFolder: Folder | null;
     setRenameFolder: (folder: Folder | null) => void;
 
@@ -158,6 +161,9 @@ export const useAppStore = create<AppState>((set) => ({
 
     renameFile: null,
     setRenameFile: (file) => set({ renameFile: file }),
+
+    changeCoverFile: null,
+    setChangeCoverFile: (file) => set({ changeCoverFile: file }),
 
     renameFolder: null,
     setRenameFolder: (folder) => set({ renameFolder: folder }),
