@@ -1,7 +1,7 @@
 /**
  * Main FileBrowser component - the core of the web interface
  */
-import { useEffect, useCallback, useRef, useState } from 'react';
+import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { FolderPlus, Grid, List, Search, ChevronRight, Home, RefreshCw, Clipboard, ArrowUp, Film, Music, Image as ImageIcon, FileText, Menu } from 'lucide-react';
 import { useFiles, useFolders, useUpdateFile, useUpdateFolder, useDeleteFolder, useDeleteFiles, useMoveFiles, TelegramFile, Folder, useRecentFiles, useContinueWatching, useDeleteFolders, useMoveFolders } from '../lib/api';
 import { useAppStore } from '../lib/store';
@@ -114,6 +114,57 @@ export default function FileBrowser() {
     const [isSelecting, setIsSelecting] = useState(false);
     const [isSidebarOpen, setSidebarOpen] = useState(true);
     const selectionStart = useRef({ x: 0, y: 0 });
+
+    // Anchor for Shift+click range selection — the last item clicked without
+    // Shift (either a plain click or a Ctrl/Cmd click).
+    const lastSelectedRef = useRef<{ type: 'file' | 'folder'; id: number } | null>(null);
+
+    // Combined list of currently visible items in their on-screen order
+    // (folders first, matching the grid/list render order below), used to
+    // resolve Shift+click ranges.
+    const orderedItems = useMemo(() => {
+        const items: { type: 'file' | 'folder'; id: number }[] = [];
+        if (showFolders && folders) {
+            folders.forEach((f) => items.push({ type: 'folder', id: f.id }));
+        }
+        (displayFiles || []).forEach((f) => items.push({ type: 'file', id: f.id }));
+        return items;
+    }, [showFolders, folders, displayFiles]);
+
+    // Central click handler for file/folder cards — resolves plain click
+    // (single select), Ctrl/Cmd+click (toggle), and Shift+click (range select
+    // from the last anchored item, Explorer/Finder-style).
+    const handleItemClick = useCallback((type: 'file' | 'folder', id: number, e: React.MouseEvent) => {
+        const isCtrl = e.ctrlKey || e.metaKey;
+        const isShift = e.shiftKey;
+        const anchor = lastSelectedRef.current;
+
+        if (isShift && anchor) {
+            const anchorIndex = orderedItems.findIndex((it) => it.type === anchor.type && it.id === anchor.id);
+            const targetIndex = orderedItems.findIndex((it) => it.type === type && it.id === id);
+            if (anchorIndex !== -1 && targetIndex !== -1) {
+                const [start, end] = anchorIndex <= targetIndex ? [anchorIndex, targetIndex] : [targetIndex, anchorIndex];
+                const range = orderedItems.slice(start, end + 1);
+                const fileIds = range.filter((it) => it.type === 'file').map((it) => it.id);
+                const folderIds = range.filter((it) => it.type === 'folder').map((it) => it.id);
+                selectAll(fileIds, folderIds);
+                // Anchor stays put — a second Shift+click re-ranges from the same origin.
+                return;
+            }
+        }
+
+        if (isCtrl) {
+            if (type === 'file') selectFile(id, true);
+            else selectFolder(id, true);
+            lastSelectedRef.current = { type, id };
+            return;
+        }
+
+        // Plain click (or a Shift+click with no usable anchor): single select, new anchor.
+        if (type === 'file') selectFile(id, false);
+        else selectFolder(id, false);
+        lastSelectedRef.current = { type, id };
+    }, [orderedItems, selectFile, selectFolder, selectAll]);
 
     // handle refresh
     const handleRefresh = useCallback(() => {
@@ -646,7 +697,7 @@ export default function FileBrowser() {
                                             folder={folder}
                                             viewMode={viewMode}
                                             selected={selectedFolderIds.has(folder.id)}
-                                            onSelect={(multi) => selectFolder(folder.id, multi)}
+                                            onSelect={(e) => handleItemClick('folder', folder.id, e)}
                                             onOpen={() => navigateToFolder(folder)}
                                             onFileDrop={handleFileDrop}
                                         />
@@ -659,7 +710,7 @@ export default function FileBrowser() {
                                             file={file}
                                             viewMode={viewMode}
                                             selected={selectedFileIds.has(file.id)}
-                                            onSelect={(multi) => selectFile(file.id, multi)}
+                                            onSelect={(e) => handleItemClick('file', file.id, e)}
                                             onPlay={() => handleFileOpen(file)}
                                         />
                                     ))}

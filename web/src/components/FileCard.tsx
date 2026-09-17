@@ -9,7 +9,7 @@ interface FileCardProps {
     file: TelegramFile;
     viewMode: 'grid' | 'list';
     selected: boolean;
-    onSelect: (multi: boolean) => void;
+    onSelect: (e: React.MouseEvent) => void;
     onPlay: () => void;
 }
 
@@ -41,14 +41,14 @@ export default function FileCard({
         e.preventDefault();
         e.stopPropagation();
         if (!selected) {
-            onSelect(false);
+            onSelect(e);
         }
         setActiveContextMenu({ type: 'file', item: file, x: e.clientX, y: e.clientY });
     };
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        onSelect(e.ctrlKey || e.metaKey);
+        onSelect(e);
     };
 
     const handleDoubleClick = (e: React.MouseEvent) => {

@@ -10,14 +10,14 @@ interface FolderCardProps {
     folder: Folder;
     viewMode: 'grid' | 'list';
     selected?: boolean;
-    onSelect?: (multi: boolean) => void;
+    onSelect?: (e: React.MouseEvent) => void;
     onOpen: () => void;
     onFileDrop: (fileId: number, folderId: number) => void;
 }
 
 export default function FolderCard({ folder, viewMode, selected, onSelect, onOpen, onFileDrop }: FolderCardProps) {
     const [isDragOver, setIsDragOver] = useState(false);
-    const { activeContextMenu, setActiveContextMenu } = useAppStore();
+    const { activeContextMenu, setActiveContextMenu, selectFolder } = useAppStore();
 
     // Check if this folder's context menu is active
     const showMenu = activeContextMenu?.type === 'folder' && activeContextMenu?.item.id === folder.id;
@@ -32,16 +32,18 @@ export default function FolderCard({ folder, viewMode, selected, onSelect, onOpe
         if (onSelect && (e.ctrlKey || e.metaKey || e.shiftKey)) {
             e.preventDefault();
             e.stopPropagation();
-            onSelect(true);
+            onSelect(e);
         } else {
             onOpen();
         }
     };
 
+    // Dedicated selection indicator (the small circle in the corner) always
+    // toggles this folder's selection, regardless of modifier keys.
     const handleSelectClick = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        onSelect?.(true);
+        selectFolder(folder.id, true);
     };
 
     // Drop handlers
