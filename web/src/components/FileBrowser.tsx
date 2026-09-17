@@ -792,6 +792,14 @@ export default function FileBrowser() {
                     <MoveFileModal
                         items={moveItems}
                         onClose={() => setMoveItems(null)}
+                        onMoved={(movedFileIds) => {
+                            // Prune moved files from the locally accumulated page list right
+                            // away — invalidating the query alone won't remove them here,
+                            // since pages are merged additively for infinite scroll.
+                            if (movedFileIds.length > 0) {
+                                setAllFiles((prev) => prev.filter((f) => !movedFileIds.includes(f.id)));
+                            }
+                        }}
                     />
                 )}
 

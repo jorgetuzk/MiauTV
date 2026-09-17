@@ -10,6 +10,9 @@ import { getLastUsedFolder, setLastUsedFolder } from '../lib/lastUsedFolder';
 interface MoveFileModalProps {
     items: { files: TelegramFile[]; folders: Folder[] };
     onClose: () => void;
+    // Called right after a successful move so the caller can prune the moved
+    // items from whatever local list it's showing, without waiting on a refetch.
+    onMoved?: (movedFileIds: number[], movedFolderIds: number[]) => void;
 }
 
 interface FlatFolder {
@@ -30,7 +33,7 @@ function flattenTree(folders: Folder[], depth = 0): FlatFolder[] {
     return result;
 }
 
-export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
+export default function MoveFileModal({ items, onClose, onMoved }: MoveFileModalProps) {
     const [selected, setSelected] = useState<{ id: number | null; name: string }>({ id: null, name: 'Raiz (Sem pasta)' });
     const [searchInput, setSearchInput] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -83,7 +86,8 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
 
             await Promise.all(promises);
             setLastUsedFolder(selected);
-            addToast(`${totalItems} item(ns) movido(s) com sucesso`);
+            onMoved?.(items.files.map((f) => f.id), movingFolderIds);
+            addToast(`${totalItems} item(ns) movido(s) para ${selected.name}`);
             clearSelection();
             onClose();
         } catch (error) {
