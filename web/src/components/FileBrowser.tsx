@@ -62,7 +62,7 @@ export default function FileBrowser() {
     const { data: filesList, isLoading: filesLoading, refetch: refetchFiles } = useFiles(currentFolderId, fileTypeFilter || undefined, searchQuery || undefined, page);
     const { data: recentFiles, isLoading: recentLoading, refetch: refetchRecent } = useRecentFiles(50);
     const { data: cwFiles, isLoading: cwLoading, refetch: refetchCW } = useContinueWatching(50);
-    
+
 
     // For files section, accumulate files from all pages
     useEffect(() => {
@@ -97,7 +97,7 @@ export default function FileBrowser() {
 
     // Combined loading state
     isLoading = isLoading || (activeSection === 'files' && foldersLoading);
-    
+
     // Mutations
     const deleteFilesMutation = useDeleteFiles();
     const deleteFolderMutation = useDeleteFolder();
@@ -147,7 +147,7 @@ export default function FileBrowser() {
     const navigateToFolder = useCallback((folder: Folder | null) => {
         if (folder === null) {
             setCurrentFolderId(null);
-            setBreadcrumbs([{ id: null, name: 'My Files' }]);
+            setBreadcrumbs([{ id: null, name: 'Meus Arquivos' }]);
         } else {
             setCurrentFolderId(folder.id);
             setBreadcrumbs([...breadcrumbs, { id: folder.id, name: folder.name }]);
@@ -167,7 +167,7 @@ export default function FileBrowser() {
     const handleDeleteConfirm = async () => {
         if (!deleteConfirm) return;
         const { type, items } = deleteConfirm;
-        
+
         try {
             if (type === 'file') {
                 const ids = items.map(i => i.id);
@@ -183,19 +183,19 @@ export default function FileBrowser() {
                  // Split into files and folders
                  const fileIds = items.filter(i => 'file_name' in i).map(i => i.id);
                  const folderIds = items.filter(i => 'name' in i && !('file_name' in i)).map(i => i.id);
-                 
+
                  const promises = [];
                  if (fileIds.length > 0) promises.push(deleteFilesMutation.mutateAsync(fileIds));
                  if (folderIds.length > 0) promises.push(deleteFoldersMutation.mutateAsync(folderIds));
-                 
+
                  await Promise.all(promises);
             }
             setDeleteConfirm(null);
             clearSelection();
-            addToast('Items deleted successfully', 'success');
+            addToast('Itens excluídos com sucesso', 'success');
         } catch (error) {
             console.error('Delete failed:', error);
-            addToast('Failed to delete items', 'error');
+            addToast('Falha ao excluir os itens', 'error');
         }
     };
 
@@ -221,7 +221,7 @@ export default function FileBrowser() {
                 }
                 setClipboard(null);
             } else if (clipboard.mode === 'copy') {
-                alert("Copying files is not yet supported. Only Move (Cut) is supported.");
+                alert("Copiar arquivos ainda não é suportado. Apenas Mover (Recortar) está disponível.");
             }
         } catch (error) {
             console.error('Paste failed:', error);
@@ -233,7 +233,7 @@ export default function FileBrowser() {
     const handleMouseDown = (e: React.MouseEvent) => {
         if (e.button !== 0) return; // Only left click
         // If clicking on a card or button, ignore
-        if ((e.target as HTMLElement).closest('.file-card') || 
+        if ((e.target as HTMLElement).closest('.file-card') ||
             (e.target as HTMLElement).closest('button') ||
             (e.target as HTMLElement).closest('.sidebar')) return;
 
@@ -246,7 +246,7 @@ export default function FileBrowser() {
             selectionStart.current = { x: startX, y: startY };
             setSelectionBox({ x1: startX, y1: startY, x2: startX, y2: startY, active: true });
         }
-        
+
         if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
             clearSelection();
         }
@@ -254,7 +254,7 @@ export default function FileBrowser() {
 
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!isSelecting || !containerRef.current) return;
-        
+
         const rect = containerRef.current.getBoundingClientRect();
         const currentX = e.clientX - rect.left + containerRef.current.scrollLeft;
         const currentY = e.clientY - rect.top + containerRef.current.scrollTop;
@@ -277,7 +277,7 @@ export default function FileBrowser() {
 
         const fileIdsToSelect: number[] = [];
         const folderIdsToSelect: number[] = [];
-        
+
         // Check files
         const fileElements = containerRef.current.querySelectorAll('[data-file-id]');
         fileElements.forEach((el) => {
@@ -424,10 +424,10 @@ export default function FileBrowser() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [
-        previewFile, showNewFolder, moveItems, deleteConfirm, 
-        selectedFileIds, displayFiles, breadcrumbs, clipboard, 
+        previewFile, showNewFolder, moveItems, deleteConfirm,
+        selectedFileIds, displayFiles, breadcrumbs, clipboard,
         currentFolderId, handlePaste, handleRefresh,
-        setPreviewFile, setShowNewFolder, setMoveItems, setDeleteConfirm, 
+        setPreviewFile, setShowNewFolder, setMoveItems, setDeleteConfirm,
         clearSelection, selectAll, setRenameFile, navigateToBreadcrumb, setClipboard, folders
     ]);
 
@@ -466,14 +466,14 @@ export default function FileBrowser() {
     return (
         <div className="flex h-screen bg-dark-950 text-white selection:bg-primary-500/30 overflow-hidden">
             <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
-            
+
             <main className={`flex-1 flex flex-col min-w-0 relative bg-gradient-to-br from-dark-950 to-dark-900 transition-[margin] duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}`}>
                 {/* Header */}
                 <header className="h-16 border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-6 bg-dark-900/50 backdrop-blur-sm z-30 sticky top-0">
                     {/* Left: Hamburger & Search & Breadcrumbs */}
                     <div className="flex items-center gap-3 md:gap-6 flex-1 min-w-0">
                         {/* Hamburger */}
-                        <button 
+                        <button
                             onClick={() => setSidebarOpen(!isSidebarOpen)}
                             className="p-2 -ml-2 text-dark-400 hover:text-white"
                         >
@@ -485,13 +485,13 @@ export default function FileBrowser() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
                             <input
                                 type="text"
-                                placeholder="Search..."
+                                placeholder="Buscar..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-dark-800/50 border border-white/[0.06] rounded-lg pl-9 pr-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary-500/50 focus:bg-dark-800 transition-all"
                             />
                         </div>
-                        
+
                         {/* Vertical Div */}
                         <div className="hidden sm:block w-px h-6 bg-white/[0.1]"></div>
 
@@ -500,9 +500,9 @@ export default function FileBrowser() {
                             {breadcrumbs.map((crumb, index) => (
                                 <div key={crumb.id || 'root'} className="flex items-center min-w-0">
                                     {index > 0 && <ChevronRight className="w-4 h-4 text-dark-600 mx-1 shrink-0" />}
-                                    <button 
+                                    <button
                                         onClick={() => navigateToBreadcrumb(index)}
-                                        className={`px-2 py-1 rounded-md text-sm truncate max-w-[150px] transition-colors ${index === breadcrumbs.length - 1 
+                                        className={`px-2 py-1 rounded-md text-sm truncate max-w-[150px] transition-colors ${index === breadcrumbs.length - 1
                                             ? 'text-white font-medium bg-white/[0.05]'
                                             : 'text-dark-400 hover:text-white hover:bg-white/[0.05]'
                                             }`}
@@ -521,7 +521,7 @@ export default function FileBrowser() {
                         <div className="hidden md:flex items-center bg-dark-800/50 rounded-lg p-0.5 border border-white/[0.06] mr-2">
                              <button
                                 onClick={() => setFileTypeFilter(null)}
-                                title="All Files"
+                                title="Todos os Arquivos"
                                 className={`p-1.5 rounded-md transition-all ${
                                     !fileTypeFilter ? 'bg-primary-600 text-white shadow-sm' : 'text-dark-400 hover:text-white hover:bg-white/[0.05]'
                                 }`}
@@ -530,7 +530,7 @@ export default function FileBrowser() {
                             </button>
                             <button
                                 onClick={() => setFileTypeFilter('video')}
-                                title="Videos"
+                                title="Vídeos"
                                 className={`p-1.5 rounded-md transition-all ${
                                     fileTypeFilter === 'video' ? 'bg-primary-600 text-white shadow-sm' : 'text-dark-400 hover:text-white hover:bg-white/[0.05]'
                                 }`}
@@ -539,7 +539,7 @@ export default function FileBrowser() {
                             </button>
                             <button
                                 onClick={() => setFileTypeFilter('audio')}
-                                title="Audio"
+                                title="Áudios"
                                 className={`p-1.5 rounded-md transition-all ${
                                     fileTypeFilter === 'audio' ? 'bg-primary-600 text-white shadow-sm' : 'text-dark-400 hover:text-white hover:bg-white/[0.05]'
                                 }`}
@@ -548,7 +548,7 @@ export default function FileBrowser() {
                             </button>
                             <button
                                 onClick={() => setFileTypeFilter('image')}
-                                title="Images"
+                                title="Imagens"
                                 className={`p-1.5 rounded-md transition-all ${
                                     fileTypeFilter === 'image' ? 'bg-primary-600 text-white shadow-sm' : 'text-dark-400 hover:text-white hover:bg-white/[0.05]'
                                 }`}
@@ -557,7 +557,7 @@ export default function FileBrowser() {
                             </button>
                             <button
                                 onClick={() => setFileTypeFilter('document')}
-                                title="Documents"
+                                title="Documentos"
                                 className={`p-1.5 rounded-md transition-all ${
                                     fileTypeFilter === 'document' ? 'bg-primary-600 text-white shadow-sm' : 'text-dark-400 hover:text-white hover:bg-white/[0.05]'
                                 }`}
@@ -565,13 +565,13 @@ export default function FileBrowser() {
                                 <FileText className="w-4 h-4" />
                             </button>
                         </div>
- 
+
                          <div className="flex items-center gap-1 bg-dark-800/50 rounded-lg p-0.5 border border-white/[0.06]">
                              <button
                                  onClick={handleRefresh}
                                  disabled={isLoading}
                                  className={`p-1.5 rounded-md text-dark-400 hover:text-white hover:bg-white/[0.05] transition-all active:scale-95 ${isLoading ? 'animate-spin' : ''}`}
-                                 title="Refresh"
+                                 title="Atualizar"
                              >
                                  <RefreshCw className="w-4 h-4" />
                              </button>
@@ -597,7 +597,7 @@ export default function FileBrowser() {
                                 className="ml-2 btn-secondary py-1.5 px-3 text-xs flex items-center gap-2 bg-primary-500/10 text-primary-300 border-primary-500/20 hover:bg-primary-500/20"
                             >
                                 <Clipboard className="w-3.5 h-3.5" />
-                                Paste ({clipboard.files.length + clipboard.folders.length})
+                                Colar ({clipboard.files.length + clipboard.folders.length})
                             </button>
                         )}
 
@@ -607,14 +607,14 @@ export default function FileBrowser() {
                                 className="ml-2 btn-primary py-1.5 px-3 text-sm flex items-center gap-2 shadow-lg shadow-primary-500/20"
                             >
                                 <FolderPlus className="w-4 h-4" />
-                                <span className="hidden sm:inline">New Folder</span>
+                                <span className="hidden sm:inline">Nova Pasta</span>
                             </button>
                         )}
                     </div>
                 </header>
 
                 {/* Content Area */}
-                <div 
+                <div
                     ref={containerRef}
                     className="flex-1 overflow-auto p-6 relative outline-none"
                     onMouseDown={handleMouseDown}
@@ -651,7 +651,7 @@ export default function FileBrowser() {
                                             onFileDrop={handleFileDrop}
                                         />
                                     ))}
-                                    
+
                                     {/* Files */}
                                     {displayFiles?.map((file) => (
                                         <FileCard
@@ -669,16 +669,16 @@ export default function FileBrowser() {
                                     <div className="w-24 h-24 rounded-3xl bg-dark-800/50 flex items-center justify-center border border-white/[0.04] mb-6 shadow-2xl">
                                         <ArrowUp className="w-10 h-10 text-dark-600 animate-bounce" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-white mb-2">No files found</h3>
+                                    <h3 className="text-xl font-bold text-white mb-2">Nenhum arquivo encontrado</h3>
                                     <p className="text-dark-400 max-w-xs">
-                                        Upload files by sending them to the Telegram bot
+                                        Envie arquivos para o bot do Telegram para fazer upload
                                     </p>
                                 </div>
                             )}
 
                             {/* Selection Rectangle Overlay */}
                             {selectionBox?.active && (
-                                <div 
+                                <div
                                     className="absolute bg-primary-500/10 border border-primary-500/30 pointer-events-none rounded sm z-50 backdrop-blur-[1px]"
                                     style={{
                                         left: Math.min(selectionBox.x1, selectionBox.x2),
@@ -701,12 +701,12 @@ export default function FileBrowser() {
                     {/* No more files message */}
                     {activeSection === 'files' && !hasMore && allFiles.length > 0 && (
                         <div className="text-center py-4 text-dark-400">
-                            No more files
+                            Não há mais arquivos
                         </div>
                     )}
                 </div>
             </main>
-            
+
             <Toasts />
 
             {/* Modals */}
@@ -728,7 +728,7 @@ export default function FileBrowser() {
                 <DeleteConfirmModal
                     type={deleteConfirm.type}
                     count={deleteConfirm.items.length}
-                    name={deleteConfirm.items.length === 1 
+                    name={deleteConfirm.items.length === 1
                         ? (deleteConfirm.type === 'file' ? (deleteConfirm.items[0] as TelegramFile).file_name : (deleteConfirm.items[0] as Folder).name)
                         : undefined
                     }

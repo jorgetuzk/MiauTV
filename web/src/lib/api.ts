@@ -189,7 +189,7 @@ api.interceptors.response.use(
             }
         } else if (error.response?.status === 429) {
             console.log('[API] 429 Too Many Requests - rate limited');
-            error.message = 'Too many requests. Please wait a moment and try again.';
+            error.message = 'Muitas requisições. Aguarde um instante e tente novamente.';
         }
         
         return Promise.reject(error);

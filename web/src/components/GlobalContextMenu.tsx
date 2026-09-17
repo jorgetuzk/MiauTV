@@ -30,7 +30,7 @@ export default function GlobalContextMenu() {
     // Adjust position to keep within viewport
     const getMenuPosition = () => {
         const menuWidth = 220;
-        const menuHeight = 350; 
+        const menuHeight = 350;
         const padding = 10;
 
         let posX = x;
@@ -160,15 +160,15 @@ export default function GlobalContextMenu() {
                         {isMultiSelect ? (
                             <>
                                 <div className="px-3 py-2 text-xs font-medium text-dark-400 uppercase tracking-wider">
-                                    {selectedFileIds.size} Selected
+                                    {selectedFileIds.size} selecionado(s)
                                 </div>
                                 <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => setMoveFiles(selectedFiles))}>
                                     <FolderInput className="w-4 h-4" />
-                                    Move ({selectedFileIds.size}) Items
+                                    Mover ({selectedFileIds.size}) itens
                                 </button>
-                                <button className="context-menu-item w-full text-left text-red-400 hover:bg-red-500/10" onClick={() => handleAction(() => setDeleteConfirm({ type: 'file', items: Array.from(selectedFileIds).map(id => ({ id } as any)) }))}> 
+                                <button className="context-menu-item w-full text-left text-red-400 hover:bg-red-500/10" onClick={() => handleAction(() => setDeleteConfirm({ type: 'file', items: Array.from(selectedFileIds).map(id => ({ id } as any)) }))}>
                                     <Trash2 className="w-4 h-4" />
-                                    Delete ({selectedFileIds.size}) Items
+                                    Excluir ({selectedFileIds.size}) itens
                                 </button>
                             </>
                         ) : (
@@ -176,7 +176,7 @@ export default function GlobalContextMenu() {
                                 {(activeContextMenu.item.file_type === 'video' || activeContextMenu.item.file_type === 'audio') && (
                                     <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => handlePlay(activeContextMenu.item as TelegramFile))}>
                                         <Play className="w-4 h-4" />
-                                        Play
+                                        Reproduzir
                                     </button>
                                 )}
                                 <button
@@ -184,9 +184,9 @@ export default function GlobalContextMenu() {
                                     onClick={() => { handleDownload(activeContextMenu.item as TelegramFile); setActiveContextMenu(null); }}
                                 >
                                     <Download className="w-4 h-4" />
-                                    Download
+                                    Baixar
                                 </button>
-                                
+
                                 <hr className="border-white/[0.08] my-1" />
 
                                 <button className="context-menu-item w-full text-left" onClick={async () => {
@@ -194,7 +194,7 @@ export default function GlobalContextMenu() {
                                     handleCopy(url, 'stream');
                                 }}>
                                     <Link className="w-4 h-4" />
-                                    {copiedId === 'stream' ? '✓ Copied!' : 'Copy Stream URL'}
+                                    {copiedId === 'stream' ? '✓ Copiado!' : 'Copiar URL de Streaming'}
                                 </button>
 
                                 <button className="context-menu-item w-full text-left" onClick={async () => {
@@ -203,7 +203,7 @@ export default function GlobalContextMenu() {
                                     handleCopy(downloadUrl, 'download');
                                 }}>
                                     <HardDriveDownload className="w-4 h-4" />
-                                    {copiedId === 'download' ? '✓ Copied!' : 'Copy Download URL'}
+                                    {copiedId === 'download' ? '✓ Copiado!' : 'Copiar URL de Download'}
                                 </button>
 
                                 <hr className="border-white/[0.08] my-1" />
@@ -212,36 +212,36 @@ export default function GlobalContextMenu() {
                                     <>
                                         <button className="context-menu-item w-full text-left" onClick={() => handleCopy(`${window.location.protocol}//${window.location.host}${(activeContextMenu.item as TelegramFile).public_stream_url}`, 'public')}>
                                             <Globe className="w-4 h-4 text-emerald-400" />
-                                            {copiedId === 'public' ? '✓ Copied!' : 'Copy Public Link'}
+                                            {copiedId === 'public' ? '✓ Copiado!' : 'Copiar Link Público'}
                                         </button>
                                         <button className="context-menu-item w-full text-left text-orange-400 hover:bg-orange-500/10" onClick={() => handleRevokeShare(activeContextMenu.item as TelegramFile)}>
                                             <ShieldOff className="w-4 h-4" />
-                                            Revoke Public Link
+                                            Revogar Link Público
                                         </button>
                                     </>
                                 ) : (
                                     <button className="context-menu-item w-full text-left" onClick={() => handleShare(activeContextMenu.item as TelegramFile)}>
                                         <Globe className="w-4 h-4" />
-                                        Create Public Link
+                                        Criar Link Público
                                     </button>
                                 )}
 
                                 <hr className="border-white/[0.08] my-1" />
-                                
+
                                 <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => setRenameFile(activeContextMenu.item as TelegramFile))}>
                                     <Edit className="w-4 h-4" />
-                                    Rename
+                                    Renomear
                                 </button>
                                 <button className="context-menu-item w-full text-left" onClick={() => handleAction(() => setMoveItems({ files: [activeContextMenu.item as TelegramFile], folders: [] }))}>
                                     <FolderInput className="w-4 h-4" />
-                                    Move to...
+                                    Mover para...
                                 </button>
-                                
+
                                 <hr className="border-white/[0.08] my-1" />
-                                
+
                                 <button className="context-menu-item w-full text-left text-red-400 hover:bg-red-500/10" onClick={() => handleAction(() => setDeleteConfirm({ type: 'file', items: [activeContextMenu.item] }))}>
                                     <Trash2 className="w-4 h-4" />
-                                    Delete
+                                    Excluir
                                 </button>
                             </>
                         )}
@@ -254,7 +254,7 @@ export default function GlobalContextMenu() {
                             onClick={() => handleAction(() => setRenameFolder(activeContextMenu.item as Folder))}
                         >
                             <Edit className="w-4 h-4" />
-                            Rename
+                            Renomear
                         </button>
                         <hr className="border-white/[0.08] my-1" />
                         <button
@@ -262,7 +262,7 @@ export default function GlobalContextMenu() {
                             onClick={() => handleAction(() => setDeleteConfirm({ type: 'folder', items: [activeContextMenu.item] }))}
                         >
                             <Trash2 className="w-4 h-4" />
-                            Delete
+                            Excluir
                         </button>
                     </>
                 )}

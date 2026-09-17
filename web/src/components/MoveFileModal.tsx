@@ -31,18 +31,18 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                 // Prevent moving folder into itself
                 const folderIds = items.folders.map(f => f.id);
                 if (selectedId && folderIds.includes(selectedId)) {
-                    addToast('Cannot move a folder into itself', 'error');
+                    addToast('Não é possível mover uma pasta para dentro dela mesma', 'error');
                     return;
                 }
                 promises.push(moveFolders({ ids: folderIds, folderId: selectedId }));
             }
 
             await Promise.all(promises);
-            addToast(`Moved ${totalItems} item(s) successfully`);
+            addToast(`${totalItems} item(ns) movido(s) com sucesso`);
             clearSelection();
             onClose();
         } catch (error) {
-            addToast('Failed to move items', 'error');
+            addToast('Falha ao mover os itens', 'error');
         }
     };
 
@@ -50,14 +50,14 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
             <div className="glass-card w-full max-w-md p-6 animate-scale-in">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold">Move {totalItems} Item{totalItems !== 1 ? 's' : ''}</h2>
+                    <h2 className="text-lg font-semibold">Mover {totalItems} Ite{totalItems !== 1 ? 'ns' : 'm'}</h2>
                     <button onClick={onClose} className="p-1 hover:bg-dark-700 rounded">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 <p className="text-sm text-dark-400 mb-4 truncate">
-                    Select destination folder
+                    Selecione a pasta de destino
                 </p>
 
                 <div className="bg-dark-800 rounded-lg max-h-64 overflow-y-auto mb-4 custom-scrollbar">
@@ -68,11 +68,11 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                             }`}
                     >
                         <Home className="w-4 h-4" />
-                        <span>Root (No folder)</span>
+                        <span>Raiz (Sem pasta)</span>
                     </button>
 
                     {isLoading ? (
-                        <div className="p-4 text-center text-dark-400">Loading...</div>
+                        <div className="p-4 text-center text-dark-400">Carregando...</div>
                     ) : (
                         folderTree?.map((folder) => (
                             <FolderTreeItem
@@ -91,7 +91,7 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                         onClick={onClose}
                         className="px-4 py-2 text-dark-400 hover:text-white transition-colors"
                     >
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         onClick={handleMove}
@@ -101,10 +101,10 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                         {isPending ? (
                             <>
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Moving...
+                                Movendo...
                             </>
                         ) : (
-                            'Move Here'
+                            'Mover Para Cá'
                         )}
                     </button>
                 </div>

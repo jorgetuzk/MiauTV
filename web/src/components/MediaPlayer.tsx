@@ -8,7 +8,7 @@ import { useAppStore } from '../lib/store';
 
 export default function MediaPlayer() {
     const { previewFile: file, setPreviewFile, isPlayerMinimized, setPlayerMinimized } = useAppStore();
-    
+
     if (!file) return null;
 
     return <MediaPlayerContent file={file} onClose={() => setPreviewFile(null)} isMinimized={isPlayerMinimized} setMinimized={setPlayerMinimized} />;
@@ -175,9 +175,9 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
         if (videoRef.current?.error) {
             const code = videoRef.current.error.code;
             if (code === 3 || code === 4) { // MEDIA_ERR_DECODE or MEDIA_ERR_SRC_NOT_SUPPORTED
-                setError("Browser cannot decode this video format.");
+                setError("O navegador não consegue decodificar este formato de vídeo.");
             } else {
-                setError("An error occurred while trying to play this video.");
+                setError("Ocorreu um erro ao tentar reproduzir este vídeo.");
             }
             setIsLoading(false);
         }
@@ -238,7 +238,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                         document.exitFullscreen();
                     } else if (!isMinimized) {
                         // If full screen mode (not minimized), esc minimizes? or closes?
-                        // Standard behavior: ESC closes modal. 
+                        // Standard behavior: ESC closes modal.
                         // But for music we might want minimize.
                         // Let's stick to close on ESC for now, user can minimize via button.
                         onClose();
@@ -319,8 +319,8 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
         <div
             ref={containerRef}
             className={`fixed transition-all duration-300 ease-in-out z-[100] ${
-                isMinimized 
-                    ? 'bottom-0 left-0 right-0 h-20 bg-dark-900 border-t border-white/10 shadow-2xl' 
+                isMinimized
+                    ? 'bottom-0 left-0 right-0 h-20 bg-dark-900 border-t border-white/10 shadow-2xl'
                     : 'inset-0 bg-black flex items-center justify-center font-sans'
             }`}
             onMouseMove={!isMinimized ? handleMouseMove : undefined}
@@ -333,7 +333,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                         <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center mx-auto mb-5 border border-yellow-500/30">
                             <AlertTriangle className="w-8 h-8 text-yellow-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Playback Not Supported</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">Reprodução Não Suportada</h3>
                         <p className="text-dark-300 mb-6">{error}</p>
 
                         <div className="flex flex-col gap-3">
@@ -342,7 +342,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                 className="btn-primary flex items-center justify-center gap-2"
                             >
                                 <ExternalLink className="w-4 h-4" />
-                                Open in VLC
+                                Abrir no VLC
                             </a>
                             <div className="flex gap-3">
                                 <Button
@@ -350,7 +350,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                     className="flex-1 btn-secondary flex items-center justify-center gap-2"
                                 >
                                     <Copy className="w-4 h-4" />
-                                    Copy URL
+                                    Copiar URL
                                 </Button>
                                 <a
                                     href={externalUrl}
@@ -359,7 +359,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <Download className="w-4 h-4" />
-                                    Download
+                                    Baixar
                                 </a>
                             </div>
                         </div>
@@ -367,7 +367,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                             onClick={onClose}
                             className="mt-6 text-dark-400 hover:text-white text-sm transition-colors"
                         >
-                            Close
+                            Fechar
                         </button>
                     </div>
                 ) : (
@@ -377,9 +377,9 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                             <div className="text-center z-10 glass-panel p-10 animate-scale-in absolute overflow-hidden">
                                 {authorizedThumbnailUrl ? (
                                     <div className="w-64 h-64 mx-auto mb-6 rounded-2xl bg-dark-800 shadow-2xl overflow-hidden border border-white/10 relative group">
-                                         <img 
-                                            src={authorizedThumbnailUrl} 
-                                            alt={file.file_name} 
+                                         <img
+                                            src={authorizedThumbnailUrl}
+                                            alt={file.file_name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
@@ -387,7 +387,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                             }}
                                          />
                                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span className="text-white text-sm font-medium">Original Artwork</span>
+                                            <span className="text-white text-sm font-medium">Capa Original</span>
                                          </div>
                                     </div>
                                 ) : (
@@ -400,7 +400,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                 <p className="text-primary-400 font-medium">{formatDuration(currentTime)} / {formatDuration(duration)}</p>
                             </div>
                         )}
-                        
+
                         {MediaElement}
 
                         {/* Loading Spinner */}
@@ -420,7 +420,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                          {/* Thumbnail/Icon */}
                         <div className="w-12 h-12 rounded-lg bg-dark-800 flex items-center justify-center flex-shrink-0 overflow-hidden border border-white/5 relative">
                             {authorizedThumbnailUrl ? (
-                                <img src={authorizedThumbnailUrl} alt="Thumb" className="w-full h-full object-cover" />
+                                <img src={authorizedThumbnailUrl} alt="Miniatura" className="w-full h-full object-cover" />
                             ) : (
                                 isVideo ? <span className="text-2xl">🎬</span> : <span className="text-2xl">🎵</span>
                             )}
@@ -435,7 +435,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                         <button onClick={(e) => { e.stopPropagation(); handleSkip(-10); }} className="p-2 text-dark-300 hover:text-white">
                             <SkipBack className="w-5 h-5" />
                         </button>
-                        <button 
+                        <button
                             onClick={(e) => { e.stopPropagation(); togglePlay(); }}
                             className="p-2 bg-primary-600 rounded-full text-white hover:bg-primary-500 shadow-lg shadow-primary-500/20"
                         >
@@ -447,14 +447,14 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                     </div>
 
                     <div className="flex items-center gap-2 border-l border-white/10 pl-4">
-                         <button onClick={() => setMinimized(false)} className="p-2 text-dark-400 hover:text-white" title="Maximize">
+                         <button onClick={() => setMinimized(false)} className="p-2 text-dark-400 hover:text-white" title="Maximizar">
                             <ChevronUp className="w-5 h-5" />
                         </button>
-                        <button onClick={onClose} className="p-2 text-dark-400 hover:text-red-400" title="Close">
+                        <button onClick={onClose} className="p-2 text-dark-400 hover:text-red-400" title="Fechar">
                             <X className="w-5 h-5" />
                         </button>
                     </div>
-                    
+
                     {/* Progress bar line at top */}
                     <div className="absolute top-0 left-0 right-0 h-0.5 bg-dark-800">
                         <div className="h-full bg-primary-500" style={{ width: `${progressPercent}%` }}></div>
@@ -473,14 +473,14 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                         <div>
                             <h3 className="text-lg font-medium truncate max-w-lg text-white">{file.file_name}</h3>
                             {((extendedFile?.last_pos || 0) > 0) && currentTime < 5 && (
-                                <p className="text-xs text-primary-400">Resumed from {formatDuration(extendedFile?.last_pos || 0)}</p>
+                                <p className="text-xs text-primary-400">Retomado de {formatDuration(extendedFile?.last_pos || 0)}</p>
                             )}
                         </div>
                         <div className="flex items-center gap-2">
                              <button
                                 onClick={() => setMinimized(true)}
                                 className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
-                                title="Minimize"
+                                title="Minimizar"
                             >
                                 <ChevronDown className="w-6 h-6" />
                             </button>
@@ -586,7 +586,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                         ? 'bg-primary-500/30 text-primary-300 border border-primary-500/40'
                                         : 'bg-white/10 text-white/80 border border-white/10 hover:bg-white/20 hover:text-white'
                                         }`}
-                                    title="Playback Speed"
+                                    title="Velocidade de Reprodução"
                                 >
                                     <Gauge className="w-4 h-4" />
                                     <span>{playbackSpeed}x</span>
@@ -610,7 +610,7 @@ function MediaPlayerContent({ file, onClose, isMinimized, setMinimized }: MediaP
                                 <button
                                     onClick={toggleFullscreen}
                                     className="p-2 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-all"
-                                    title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                                    title={isFullscreen ? "Sair da Tela Cheia" : "Tela Cheia"}
                                 >
                                     {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
                                 </button>

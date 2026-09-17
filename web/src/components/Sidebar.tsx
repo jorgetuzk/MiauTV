@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     return (
         <>
             {/* Mobile Overlay */}
-            <div 
+            <div
                 className={`fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity duration-300 ${
                     isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                 }`}
@@ -71,17 +71,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {/* Logo Area */}
                 <div className="p-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <img 
-                            src={logo} 
-                            alt="MiauTV Logo" 
-                            className="w-8 h-8 rounded-lg shadow-lg shadow-primary-500/20 object-contain" 
+                        <img
+                            src={logo}
+                            alt="Logo da MiauTV"
+                            className="w-8 h-8 rounded-lg shadow-lg shadow-primary-500/20 object-contain"
                         />
                         <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
                             MiauTV
                         </span>
                     </div>
                     {/* Close button for mobile */}
-                    <button 
+                    <button
                         onClick={onClose}
                         className="md:hidden p-1 text-dark-400 hover:text-white"
                     >
@@ -91,16 +91,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                 {/* Navigation */}
                 <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-                    <NavItem section="files" icon={Files} label="My Files" />
-                    <NavItem section="recent" icon={Clock} label="Recently Added" />
-                    <NavItem section="continue_watching" icon={PlayCircle} label="Continue Watching" />
+                    <NavItem section="files" icon={Files} label="Meus Arquivos" />
+                    <NavItem section="recent" icon={Clock} label="Adicionados Recentemente" />
+                    <NavItem section="continue_watching" icon={PlayCircle} label="Continuar Assistindo" />
                 </nav>
 
                 {/* Storage Info */}
                 <div className="p-4 m-3 rounded-xl bg-dark-800/50 border border-white/[0.04]">
                     <div className="flex items-center gap-2 mb-2 text-sm text-dark-300">
                         <HardDrive className="w-4 h-4" />
-                        <span>Storage</span>
+                        <span>Armazenamento</span>
                     </div>
                     {storage ? (
                         <>
@@ -108,7 +108,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 {formatFileSize(storage.total_size)}
                             </div>
                             <div className="text-xs text-primary-400">
-                                Unlimited Storage 🚀
+                                Armazenamento Ilimitado 🚀
                             </div>
                         </>
                     ) : (
@@ -123,14 +123,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-dark-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                     >
                         <LogOut className="w-5 h-5" />
-                        <span className="font-medium">Logout</span>
+                        <span className="font-medium">Sair</span>
                     </button>
                     <button
                         onClick={() => setShowLogoutAllConfirm(true)}
                         className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-dark-400 hover:text-orange-400 hover:bg-orange-500/10 transition-colors mt-1"
                     >
                         <Users className="w-5 h-5" />
-                        <span className="font-medium">Logout All</span>
+                        <span className="font-medium">Sair de Todos os Dispositivos</span>
                     </button>
                 </div>
             </aside>
@@ -143,9 +143,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <LogOut className="w-6 h-6 text-red-500" />
                             </div>
-                            <h3 className="text-xl font-semibold text-white mb-2">Confirm Logout</h3>
+                            <h3 className="text-xl font-semibold text-white mb-2">Confirmar Saída</h3>
                             <p className="text-dark-400 text-sm">
-                                Are you sure you want to end your session?
+                                Tem certeza que deseja encerrar sua sessão?
                             </p>
                         </div>
                         <div className="p-4 border-t border-white/5 flex gap-3 bg-dark-800/50">
@@ -153,13 +153,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 onClick={() => setShowLogoutConfirm(false)}
                                 className="flex-1 px-4 py-2 rounded-lg text-dark-300 hover:bg-white/5 transition-colors font-medium"
                             >
-                                Cancel
+                                Cancelar
                             </button>
                             <button
                                 onClick={handleLogout}
                                 className="flex-1 px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors shadow-lg shadow-red-500/20"
                             >
-                                Logout
+                                Sair
                             </button>
                         </div>
                     </div>
@@ -174,9 +174,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Users className="w-6 h-6 text-orange-500" />
                             </div>
-                            <h3 className="text-xl font-semibold text-white mb-2">Logout Everywhere</h3>
+                            <h3 className="text-xl font-semibold text-white mb-2">Sair de Todos os Dispositivos</h3>
                             <p className="text-dark-400 text-sm">
-                                This will end your session on <strong>all devices</strong>. Are you sure?
+                                Isso vai encerrar sua sessão em <strong>todos os dispositivos</strong>. Tem certeza?
                             </p>
                         </div>
                         <div className="p-4 border-t border-white/5 flex gap-3 bg-dark-800/50">
@@ -184,14 +184,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 onClick={() => setShowLogoutAllConfirm(false)}
                                 className="flex-1 px-4 py-2 rounded-lg text-dark-300 hover:bg-white/5 transition-colors font-medium"
                             >
-                                Cancel
+                                Cancelar
                             </button>
                             <button
                                 onClick={handleLogoutAll}
                                 className="flex-1 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors shadow-lg shadow-orange-500/20"
                                 disabled={logoutAllMutation.isPending}
                             >
-                                {logoutAllMutation.isPending ? 'Logging out...' : 'Logout All'}
+                                {logoutAllMutation.isPending ? 'Saindo...' : 'Sair de Todos'}
                             </button>
                         </div>
                     </div>

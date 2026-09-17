@@ -11,11 +11,17 @@ interface DeleteConfirmModalProps {
     onClose: () => void;
 }
 
+const typeLabels: Record<'file' | 'folder' | 'multiple', string> = {
+    file: 'Arquivo',
+    folder: 'Pasta',
+    multiple: 'Itens',
+};
+
 export default function DeleteConfirmModal({ type, name, count = 1, onConfirm, onClose }: DeleteConfirmModalProps) {
-    const title = count > 1 ? `Delete ${count} items` : `Delete ${type}`;
-    const message = count > 1 
-        ? `Are you sure you want to delete these ${count} items?`
-        : <>Are you sure you want to delete <span className="text-white font-medium">"{name}"</span>?</>;
+    const title = count > 1 ? `Excluir ${count} Itens` : `Excluir ${typeLabels[type]}`;
+    const message = count > 1
+        ? `Tem certeza que deseja excluir estes ${count} itens?`
+        : <>Tem certeza que deseja excluir <span className="text-white font-medium">"{name}"</span>?</>;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -34,11 +40,11 @@ export default function DeleteConfirmModal({ type, name, count = 1, onConfirm, o
                     <p>{message}</p>
                     {type === 'folder' && (
                         <p className="mt-2 text-sm text-dark-400">
-                            Files in this folder will be moved to root.
+                            Os arquivos desta pasta serão movidos para a raiz.
                         </p>
                     )}
                     <p className="mt-2 text-sm text-red-400">
-                        This action cannot be undone.
+                        Esta ação não pode ser desfeita.
                     </p>
                 </div>
 
@@ -47,13 +53,13 @@ export default function DeleteConfirmModal({ type, name, count = 1, onConfirm, o
                         onClick={onClose}
                         className="px-4 py-2 text-dark-400 hover:text-white transition-colors"
                     >
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         onClick={onConfirm}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
                     >
-                        Delete
+                        Excluir
                     </button>
                 </div>
             </div>

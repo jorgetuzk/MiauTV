@@ -13,6 +13,18 @@ interface FileCardProps {
     onPlay: () => void;
 }
 
+// Display labels for file types (the underlying value stays in English, only the label shown to the user is translated)
+const fileTypeLabels: Record<string, string> = {
+    video: 'vídeo',
+    audio: 'áudio',
+    image: 'imagem',
+    document: 'documento',
+};
+
+function getFileTypeLabel(fileType: string) {
+    return fileTypeLabels[fileType] || fileType;
+}
+
 export default function FileCard({
     file,
     viewMode,
@@ -94,7 +106,7 @@ export default function FileCard({
                     <div className="flex items-center gap-3 text-xs text-dark-400 mt-1">
                         <span className="flex items-center gap-1">
                             {getSmallIcon()}
-                            <span className="capitalize">{file.file_type}</span>
+                            <span className="capitalize">{getFileTypeLabel(file.file_type)}</span>
                         </span>
                         <span className="w-1 h-1 rounded-full bg-dark-600"></span>
                         <span>{formatFileSize(file.file_size)}</span>
@@ -164,8 +176,8 @@ export default function FileCard({
                 {/* Progress Bar */}
                 {file.last_pos && file.duration && (file.last_pos / file.duration > 0.05) && (
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-                        <div 
-                            className="h-full bg-primary-500" 
+                        <div
+                            className="h-full bg-primary-500"
                             style={{ width: `${Math.min(100, (file.last_pos / file.duration) * 100)}%` }}
                         />
                     </div>
@@ -195,12 +207,12 @@ export default function FileCard({
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                         <span className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border ${
-                            selected 
-                            ? 'bg-primary-500/20 border-primary-500/20 text-primary-300' 
+                            selected
+                            ? 'bg-primary-500/20 border-primary-500/20 text-primary-300'
                             : 'bg-dark-800 border-white/[0.05] text-dark-400 group-hover:border-white/[0.1]'
                         }`}>
                             {getSmallIcon()}
-                            <span className="capitalize">{file.file_type}</span>
+                            <span className="capitalize">{getFileTypeLabel(file.file_type)}</span>
                         </span>
                         <p className="text-[10px] text-dark-500">
                             {formatFileSize(file.file_size)}
@@ -222,7 +234,7 @@ export default function FileCard({
                         className={`p-1.5 rounded-lg transition-colors ${showMenu ? 'bg-white/10 text-white' : 'hover:bg-white/[0.08] text-dark-400'}`}
                     >
                         <MoreVertical className="w-4 h-4" />
-                    </button> 
+                    </button>
                 </div>
             </div>
         </div>

@@ -113,7 +113,7 @@ export default function FolderCard({ folder, viewMode, selected, onSelect, onOpe
                 <div className="flex-1 min-w-0">
                     <p className={`font-medium truncate text-sm transition-colors ${selected ? 'text-primary-300' : 'text-white group-hover:text-primary-300'}`}>{folder.name}</p>
                     <p className="text-xs text-dark-400 mt-0.5">
-                        {folder.file_count} {folder.file_count === 1 ? 'file' : 'files'}
+                        {folder.file_count} {folder.file_count === 1 ? 'arquivo' : 'arquivos'}
                     </p>
                 </div>
 
@@ -192,7 +192,7 @@ export default function FolderCard({ folder, viewMode, selected, onSelect, onOpe
                 {folder.name}
             </p>
             <p className="text-xs text-dark-500 mt-1">
-                {folder.file_count} {folder.file_count === 1 ? 'file' : 'files'}
+                {folder.file_count} {folder.file_count === 1 ? 'arquivo' : 'arquivos'}
             </p>
         </div>
     );
