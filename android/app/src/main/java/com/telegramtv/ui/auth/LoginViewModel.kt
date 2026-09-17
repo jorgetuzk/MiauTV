@@ -142,7 +142,7 @@ class LoginViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 isLoading = true, 
                 error = null,
-                debugLog = "Starting generateLoginCode...\n"
+                debugLog = "Iniciando generateLoginCode...\n"
             )
 
             try {
@@ -154,7 +154,7 @@ class LoginViewModel @Inject constructor(
                             loginCode = response.code,
                             expiresAt = response.expiresAt,
                             isLoading = false,
-                            debugLog = _uiState.value.debugLog + "Success! Code: ${response.code}\n"
+                            debugLog = _uiState.value.debugLog + "Sucesso! Código: ${response.code}\n"
                         )
                         startPolling(response.code)
                     },
@@ -162,16 +162,16 @@ class LoginViewModel @Inject constructor(
                         e.printStackTrace()
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = "Failed: ${e.message}",
-                            debugLog = _uiState.value.debugLog + "Failed: ${e.message}\n"
+                            error = "Falha: ${e.message}",
+                            debugLog = _uiState.value.debugLog + "Falha: ${e.message}\n"
                         )
                     }
                 )
             } catch (e: Exception) {
                  _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "Crash: ${e.message}",
-                    debugLog = _uiState.value.debugLog + "Crash: ${e.message}\n"
+                    error = "Erro: ${e.message}",
+                    debugLog = _uiState.value.debugLog + "Erro: ${e.message}\n"
                 )
             }
         }
@@ -199,10 +199,10 @@ class LoginViewModel @Inject constructor(
                     },
                     onFailure = { e ->
                         // Check if code expired
-                        if (e.message?.contains("expired") == true) {
+                        if (e.message?.contains("expirado", ignoreCase = true) == true) {
                             _uiState.value = _uiState.value.copy(
                                 isPolling = false,
-                                error = "Code expired. Please generate a new one."
+                                error = "Código expirado. Gere um novo código."
                             )
                             return@launch
                         }
@@ -216,7 +216,7 @@ class LoginViewModel @Inject constructor(
             // Timeout after 5 minutes
             _uiState.value = _uiState.value.copy(
                 isPolling = false,
-                error = "Login timeout. Please try again."
+                error = "Tempo de login esgotado. Tente novamente."
             )
         }
     }

@@ -61,10 +61,10 @@ class AudioPlaybackService : MediaSessionService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Audio Playback",
+                "Reprodução de Áudio",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Background audio playback controls"
+                description = "Controles de reprodução de áudio em segundo plano"
                 setShowBadge(false)
             }
             val manager = getSystemService(NotificationManager::class.java)
@@ -78,7 +78,7 @@ class AudioPlaybackService : MediaSessionService() {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.app_logo)
             .setContentTitle("MiauTV")
-            .setContentText("Playing audio in background")
+            .setContentText("Reproduzindo áudio em segundo plano")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
 

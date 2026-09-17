@@ -54,7 +54,7 @@ fun DetailsScreen(
     ) {
         when {
             uiState.isLoading -> {
-                LoadingIndicator(message = "Loading file details...")
+                LoadingIndicator(message = "Carregando detalhes do arquivo...")
             }
 
             uiState.error != null -> {
@@ -126,7 +126,7 @@ fun DetailsScreen(
                             icon = {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back",
+                                    contentDescription = "Voltar",
                                     tint = TVTextPrimary,
                                     modifier = Modifier.size(24.dp)
                                 )
@@ -153,27 +153,27 @@ fun DetailsScreen(
                         ) {
                             GlassMetadataChip(
                                 icon = Icons.Default.Storage,
-                                label = "Size",
+                                label = "Tamanho",
                                 value = file.formattedSize
                             )
                             file.formattedDuration?.let {
                                 GlassMetadataChip(
                                     icon = Icons.Default.Timer,
-                                    label = "Duration",
+                                    label = "Duração",
                                     value = it
                                 )
                             }
                             file.resolution?.let {
                                 GlassMetadataChip(
                                     icon = Icons.Default.HighQuality,
-                                    label = "Quality",
+                                    label = "Qualidade",
                                     value = it,
                                     accent = true
                                 )
                             }
                             GlassMetadataChip(
                                 icon = Icons.Default.Description,
-                                label = "Type",
+                                label = "Tipo",
                                 value = file.fileType.uppercase()
                             )
                         }
@@ -186,21 +186,21 @@ fun DetailsScreen(
                         ) {
                             if (watchProgress != null && watchProgress.position > 0 && !watchProgress.completed) {
                                 FocusablePlayButton(
-                                    text = "Resume from ${watchProgress.formattedPosition}",
+                                    text = "Retomar de ${watchProgress.formattedPosition}",
                                     icon = Icons.Default.PlayArrow,
                                     isPrimary = true,
                                     onClick = { onPlayClick(fileId, watchProgress.position * 1000L) }
                                 )
 
                                 FocusablePlayButton(
-                                    text = "Play from Start",
+                                    text = "Reproduzir do Início",
                                     icon = Icons.Default.Replay,
                                     isPrimary = false,
                                     onClick = { onPlayClick(fileId, 0L) }
                                 )
                             } else {
                                 FocusablePlayButton(
-                                    text = "Play",
+                                    text = "Reproduzir",
                                     icon = Icons.Default.PlayArrow,
                                     isPrimary = true,
                                     onClick = { onPlayClick(fileId, 0L) }
@@ -241,7 +241,7 @@ fun DetailsScreen(
                             }
                             else -> {
                                 FocusablePlayButton(
-                                    text = "Download",
+                                    text = "Baixar",
                                     icon = Icons.Default.CloudDownload,
                                     isPrimary = false,
                                     onClick = { viewModel.startDownload(context) }
@@ -513,7 +513,7 @@ private fun DownloadProgressCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (status == DownloadManager.STATUS_PENDING) "Preparing download..." else "Downloading",
+                        text = if (status == DownloadManager.STATUS_PENDING) "Preparando download..." else "Baixando",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TVTextPrimary,
                         fontWeight = FontWeight.SemiBold
@@ -544,7 +544,7 @@ private fun DownloadProgressCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = if (speed > 0) "${formatBytes(speed)}/s" else "Calculating...",
+                    text = if (speed > 0) "${formatBytes(speed)}/s" else "Calculando...",
                     style = MaterialTheme.typography.labelSmall,
                     color = TVSecondary
                 )
@@ -672,7 +672,7 @@ private fun LocalFileCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Downloaded",
+                        text = "Baixado",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color(0xFF4CAF50),
                         fontWeight = FontWeight.SemiBold
@@ -710,13 +710,13 @@ private fun LocalFileCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 FocusablePlayButton(
-                    text = "Play Offline",
+                    text = "Reproduzir Offline",
                     icon = Icons.Default.PlayArrow,
                     isPrimary = true,
                     onClick = onPlayOffline
                 )
                 FocusablePlayButton(
-                    text = if (showDeleteConfirm) "Confirm Delete" else "Delete",
+                    text = if (showDeleteConfirm) "Confirmar Exclusão" else "Excluir",
                     icon = Icons.Default.Delete,
                     isPrimary = false,
                     onClick = {

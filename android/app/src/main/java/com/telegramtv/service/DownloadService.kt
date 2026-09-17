@@ -61,7 +61,7 @@ class DownloadService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Must call startForeground immediately
-        startForeground(SUMMARY_NOTIFICATION_ID, buildSummaryNotification("Preparing downloads..."))
+        startForeground(SUMMARY_NOTIFICATION_ID, buildSummaryNotification("Preparando downloads..."))
 
         // Start observing download tasks
         observerJob?.cancel()
@@ -89,8 +89,8 @@ class DownloadService : Service() {
             if (completed.isNotEmpty()) {
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                    .setContentTitle("Downloads complete")
-                    .setContentText("${completed.size} file(s) downloaded")
+                    .setContentTitle("Downloads concluídos")
+                    .setContentText("${completed.size} arquivo(s) baixado(s)")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
                     .build()
@@ -105,11 +105,11 @@ class DownloadService : Service() {
         // Update summary notification
         val summaryText = buildString {
             if (activeDownloads.isNotEmpty()) {
-                append("${activeDownloads.size} downloading")
+                append("${activeDownloads.size} baixando")
             }
             if (pausedDownloads.isNotEmpty()) {
                 if (isNotEmpty()) append(", ")
-                append("${pausedDownloads.size} paused")
+                append("${pausedDownloads.size} pausado(s)")
             }
         }
         notificationManager.notify(SUMMARY_NOTIFICATION_ID, buildSummaryNotification(summaryText))
@@ -146,7 +146,7 @@ class DownloadService : Service() {
             val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(task.fileName)
-                .setContentText("Paused • ${progress}%")
+                .setContentText("Pausado • ${progress}%")
                 .setProgress(100, progress, false)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
@@ -163,7 +163,7 @@ class DownloadService : Service() {
     private fun buildSummaryNotification(text: String): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle("MiauTV Downloads")
+            .setContentTitle("Downloads do MiauTV")
             .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
@@ -178,7 +178,7 @@ class DownloadService : Service() {
                 "Downloads",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Download progress notifications"
+                description = "Notificações de progresso de download"
                 setShowBadge(false)
             }
             val manager = getSystemService(NotificationManager::class.java)

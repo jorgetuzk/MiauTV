@@ -197,7 +197,7 @@ class FileDownloader(
                 val body = response.body ?: run {
                     updateTask(task.copy(
                         status = DownloadStatus.FAILED,
-                        error = "Empty response body"
+                        error = "Corpo da resposta vazio"
                     ))
                     return@launch
                 }
@@ -281,7 +281,7 @@ class FileDownloader(
             } catch (e: Exception) {
                 updateTask(_tasks.value[task.id]?.copy(
                     status = DownloadStatus.FAILED,
-                    error = e.message ?: "Download failed",
+                    error = e.message ?: "Falha no download",
                     speed = 0L
                 ) ?: return@launch)
             } finally {

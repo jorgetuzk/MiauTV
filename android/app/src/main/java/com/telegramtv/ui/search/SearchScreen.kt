@@ -56,7 +56,7 @@ fun SearchScreen(
             when {
                 uiState.isSearching -> {
                     LoadingIndicator(
-                        message = "Searching...",
+                        message = "Buscando...",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -71,8 +71,8 @@ fun SearchScreen(
 
                 uiState.hasSearched && uiState.results.isEmpty() -> {
                     EmptyState(
-                        title = "No results found",
-                        subtitle = "Try a different search term",
+                        title = "Nenhum resultado encontrado",
+                        subtitle = "Tente um termo de busca diferente",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -80,7 +80,7 @@ fun SearchScreen(
                 uiState.results.isNotEmpty() -> {
                     // Results count
                     Text(
-                        text = "${uiState.results.size} results",
+                        text = "${uiState.results.size} resultados",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TVTextSecondary,
                         modifier = Modifier.padding(horizontal = 48.dp, vertical = 8.dp)
@@ -124,7 +124,7 @@ fun SearchScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Search your files",
+                                text = "Busque seus arquivos",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = TVTextSecondary
                             )
@@ -163,7 +163,7 @@ private fun SearchHeader(
             icon = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = "Voltar",
                     tint = TVTextPrimary,
                     modifier = Modifier.size(24.dp)
                 )
@@ -214,7 +214,7 @@ private fun SearchHeader(
                     decorationBox = { innerTextField ->
                         if (query.isEmpty()) {
                             Text(
-                                text = "Search files...",
+                                text = "Buscar arquivos...",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = TVTextSecondary
                             )
@@ -227,7 +227,7 @@ private fun SearchHeader(
                     IconButton(onClick = onClear) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "Clear",
+                            contentDescription = "Limpar",
                             tint = TVTextSecondary
                         )
                     }

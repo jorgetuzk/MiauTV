@@ -27,7 +27,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to fetch files: ${response.code()}"))
+                Result.failure(Exception("Falha ao buscar arquivos: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -43,7 +43,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("File not found"))
+                Result.failure(Exception("Arquivo não encontrado"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -59,7 +59,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()?.items ?: emptyList())
             } else {
-                Result.failure(Exception("Search failed: ${response.code()}"))
+                Result.failure(Exception("Falha na busca: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -76,7 +76,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to update file"))
+                Result.failure(Exception("Falha ao atualizar arquivo"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -92,7 +92,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to delete file"))
+                Result.failure(Exception("Falha ao excluir arquivo"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -110,7 +110,7 @@ class FilesRepository @Inject constructor(
             } else if (response.code() == 404) {
                 Result.success(null)
             } else {
-                Result.failure(Exception("Failed to get progress"))
+                Result.failure(Exception("Falha ao obter progresso"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -132,7 +132,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to update progress"))
+                Result.failure(Exception("Falha ao atualizar progresso"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -148,7 +148,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to load home data"))
+                Result.failure(Exception("Falha ao carregar dados iniciais"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -164,7 +164,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to load continue watching"))
+                Result.failure(Exception("Falha ao carregar Continuar Assistindo"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -180,7 +180,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to load recent files"))
+                Result.failure(Exception("Falha ao carregar arquivos recentes"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -196,7 +196,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Search failed"))
+                Result.failure(Exception("Falha na busca"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -222,10 +222,10 @@ class FilesRepository @Inject constructor(
                 if (file.publicHash != null) {
                     Result.success("${serverUrl}/api/stream/s/${file.publicHash}")
                 } else {
-                    Result.failure(Exception("Failed to generate public hash"))
+                    Result.failure(Exception("Falha ao gerar link público"))
                 }
             } else {
-                Result.failure(Exception("Failed to share file: ${response.code()}"))
+                Result.failure(Exception("Falha ao compartilhar arquivo: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -241,7 +241,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to revoke share"))
+                Result.failure(Exception("Falha ao revogar compartilhamento"))
             }
         } catch (e: Exception) {
             Result.failure(e)

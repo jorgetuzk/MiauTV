@@ -67,18 +67,18 @@ fun SettingsScreen(
             ) {
                 // User info section
                 if (uiState.userName != null) {
-                    SettingsSection(title = "Account") {
+                    SettingsSection(title = "Conta") {
                         SettingsItem(
-                            label = "Logged in as",
+                            label = "Conectado como",
                             value = uiState.userName!!
                         )
                     }
                 }
 
                 // Playback settings
-                SettingsSection(title = "Playback") {
+                SettingsSection(title = "Reprodução") {
                     SettingsToggle(
-                        label = "Auto-play next file",
+                        label = "Reproduzir próximo arquivo automaticamente",
                         checked = uiState.autoPlayNext,
                         onCheckedChange = { viewModel.toggleAutoPlayNext() }
                     )
@@ -99,7 +99,7 @@ fun SettingsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Logout",
+                        text = "Sair",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
@@ -131,7 +131,7 @@ private fun SettingsHeader(onBackClick: () -> Unit) {
             icon = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = "Voltar",
                     tint = TVTextPrimary,
                     modifier = Modifier.size(24.dp)
                 )
@@ -152,7 +152,7 @@ private fun SettingsHeader(onBackClick: () -> Unit) {
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "Settings",
+            text = "Configurações",
             style = MaterialTheme.typography.headlineLarge,
             color = TVTextPrimary,
             fontWeight = FontWeight.Bold
@@ -325,24 +325,24 @@ private fun LogoutConfirmDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Logout",
+                text = "Sair",
                 style = MaterialTheme.typography.headlineSmall
             )
         },
         text = {
             Text(
-                text = "Are you sure you want to logout?",
+                text = "Tem certeza que deseja sair?",
                 style = MaterialTheme.typography.bodyLarge
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Logout", color = TVError)
+                Text("Sair", color = TVError)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Cancelar")
             }
         },
         containerColor = TVSurface

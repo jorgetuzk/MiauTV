@@ -42,7 +42,7 @@ fun FolderScreen(
     ) {
         when {
             uiState.isLoading -> {
-                LoadingIndicator(message = "Loading folder...")
+                LoadingIndicator(message = "Carregando pasta...")
             }
 
             uiState.error != null -> {
@@ -56,7 +56,7 @@ fun FolderScreen(
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Header
                     FolderHeader(
-                        folderName = uiState.folder?.name ?: "Folder",
+                        folderName = uiState.folder?.name ?: "Pasta",
                         parentPath = uiState.parentPath,
                         onBackClick = onBackClick
                     )
@@ -93,8 +93,8 @@ fun FolderScreen(
                     // Empty state
                     if (uiState.subfolders.isEmpty() && uiState.files.isEmpty()) {
                         EmptyState(
-                            title = "This folder is empty",
-                            subtitle = "No files or subfolders here"
+                            title = "Esta pasta está vazia",
+                            subtitle = "Nenhum arquivo ou subpasta aqui"
                         )
                     }
                 }
@@ -136,7 +136,7 @@ private fun FolderHeader(
             icon = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = "Voltar",
                     tint = TVTextPrimary,
                     modifier = Modifier.size(24.dp)
                 )

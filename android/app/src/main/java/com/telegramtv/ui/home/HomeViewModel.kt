@@ -97,7 +97,7 @@ class HomeViewModel @Inject constructor(
             recentFiles = recentFiles,
             folders = folders,
             error = if (recentFiles.isEmpty() && folders.isEmpty()) {
-                "Failed to load content"
+                "Falha ao carregar conteúdo"
             } else null
         )
     }

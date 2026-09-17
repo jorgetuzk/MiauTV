@@ -104,7 +104,7 @@ class SearchViewModel @Inject constructor(
             onFailure = { e ->
                 _uiState.value = _uiState.value.copy(
                     isSearching = false,
-                    error = e.message ?: "Search failed",
+                    error = e.message ?: "Falha na busca",
                     hasSearched = true
                 )
             }
@@ -177,7 +177,7 @@ class SearchViewModel @Inject constructor(
                 }
                 context.startActivity(intent)
             } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "No external player found", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, "Nenhum player externo encontrado", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -190,9 +190,9 @@ class SearchViewModel @Inject constructor(
             
             publicLinkResult.onSuccess { url ->
                 val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                val clip = android.content.ClipData.newPlainText("Public Link", url)
+                val clip = android.content.ClipData.newPlainText("Link Público", url)
                 clipboard.setPrimaryClip(clip)
-                android.widget.Toast.makeText(context, "Public link copied", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, "Link público copiado", android.widget.Toast.LENGTH_SHORT).show()
                 // Update result to show hash icon
                 filesRepository.getFile(file.id).onSuccess { updated ->
                     _uiState.value = _uiState.value.copy(
@@ -206,7 +206,7 @@ class SearchViewModel @Inject constructor(
     fun revokePublicLink(file: FileItem) {
         viewModelScope.launch {
             filesRepository.revokeShare(file.id).onSuccess {
-                android.widget.Toast.makeText(context, "Public link revoked", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, "Link público revogado", android.widget.Toast.LENGTH_SHORT).show()
                 filesRepository.getFile(file.id).onSuccess { updated ->
                     _uiState.value = _uiState.value.copy(
                         results = _uiState.value.results.map { if (it.id == file.id) updated else it }
@@ -227,9 +227,9 @@ class SearchViewModel @Inject constructor(
                 "$serverUrl/api/stream/${file.id}"
             }
             val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Download Link", downloadUrl)
+            val clip = android.content.ClipData.newPlainText("Link de Download", downloadUrl)
             clipboard.setPrimaryClip(clip)
-            android.widget.Toast.makeText(context, "Download link copied", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, "Link de download copiado", android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 }

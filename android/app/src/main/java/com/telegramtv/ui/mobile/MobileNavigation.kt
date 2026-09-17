@@ -41,8 +41,8 @@ sealed class BottomNavItem(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector
 ) {
-    object Home : BottomNavItem("home", "Home", Icons.Filled.Home, Icons.Outlined.Home)
-    object Search : BottomNavItem("search", "Search", Icons.Filled.Search, Icons.Outlined.Search)
+    object Home : BottomNavItem("home", "Início", Icons.Filled.Home, Icons.Outlined.Home)
+    object Search : BottomNavItem("search", "Buscar", Icons.Filled.Search, Icons.Outlined.Search)
     object Downloads : BottomNavItem("downloads", "Downloads", Icons.Filled.Download, Icons.Outlined.Download)
 }
 

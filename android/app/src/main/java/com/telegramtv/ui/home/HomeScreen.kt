@@ -91,8 +91,8 @@ fun HomeScreen(
                         if (uiState.continueWatching.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Continue Watching",
-                                    subtitle = "${uiState.continueWatching.size} in progress",
+                                    title = "Continuar Assistindo",
+                                    subtitle = "${uiState.continueWatching.size} em andamento",
                                     icon = Icons.Default.PlayCircle
                                 ) {
                                     ContentRow(
@@ -110,8 +110,8 @@ fun HomeScreen(
                         if (uiState.recentFiles.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Recently Added",
-                                    subtitle = "Latest uploads",
+                                    title = "Adicionados Recentemente",
+                                    subtitle = "Últimos envios",
                                     icon = Icons.Default.Schedule
                                 ) {
                                     ContentRow(
@@ -128,8 +128,8 @@ fun HomeScreen(
                         if (uiState.folders.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Your Library",
-                                    subtitle = "${uiState.folders.size} folders",
+                                    title = "Sua Biblioteca",
+                                    subtitle = "${uiState.folders.size} pastas",
                                     icon = Icons.Default.Folder
                                 ) {
                                     FolderRow(
@@ -225,7 +225,7 @@ private fun ModernTopBar(
                         letterSpacing = (-0.5).sp
                     )
                     Text(
-                        text = "Stream your files",
+                        text = "Transmita seus arquivos",
                         style = MaterialTheme.typography.bodySmall,
                         color = TVTextSecondary.copy(alpha = 0.6f),
                         fontSize = 11.sp,
@@ -238,13 +238,13 @@ private fun ModernTopBar(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ModernActionButton(
                     icon = Icons.Outlined.Search,
-                    label = "Search",
+                    label = "Buscar",
                     onClick = onSearchClick
                 )
 
                 ModernActionButton(
                     icon = Icons.Outlined.Settings,
-                    label = "Settings",
+                    label = "Configurações",
                     onClick = onSettingsClick
                 )
             }
@@ -426,7 +426,7 @@ private fun ModernLoadingState() {
                 label = "alpha"
             )
             Text(
-                text = "Loading your library...",
+                text = "Carregando sua biblioteca...",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TVTextSecondary.copy(alpha = alpha * 0.7f)
             )
@@ -505,7 +505,7 @@ private fun ModernErrorState(
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "Connection Error",
+                text = "Erro de Conexão",
                 style = MaterialTheme.typography.titleLarge,
                 color = TVTextPrimary,
                 fontWeight = FontWeight.SemiBold,
@@ -549,7 +549,7 @@ private fun ModernErrorState(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Try Again",
+                            text = "Tentar Novamente",
                             color = Color.White,
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
@@ -582,7 +582,7 @@ private fun ModernErrorState(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Settings",
+                            text = "Configurações",
                             color = TVTextPrimary,
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
@@ -626,7 +626,7 @@ private fun ModernEmptyState() {
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "Your Library is Empty",
+                text = "Sua Biblioteca Está Vazia",
                 style = MaterialTheme.typography.titleLarge,
                 color = TVTextPrimary,
                 fontWeight = FontWeight.SemiBold,
@@ -636,7 +636,7 @@ private fun ModernEmptyState() {
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Send files via Telegram bot to get started",
+                text = "Envie arquivos pelo bot do Telegram para começar",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TVTextSecondary.copy(alpha = 0.6f),
                 fontSize = 13.sp

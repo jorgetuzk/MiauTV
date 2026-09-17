@@ -88,8 +88,8 @@ class MobileMainActivity : ComponentActivity() {
             )
             actions.add(android.app.RemoteAction(
                 playPauseIcon, 
-                if (exoPlayer.isPlaying) "Pause" else "Play", 
-                if (exoPlayer.isPlaying) "Pause" else "Play", 
+                if (exoPlayer.isPlaying) "Pausar" else "Reproduzir", 
+                if (exoPlayer.isPlaying) "Pausar" else "Reproduzir", 
                 playPauseIntent
             ))
 
@@ -107,8 +107,8 @@ class MobileMainActivity : ComponentActivity() {
             )
             actions.add(android.app.RemoteAction(
                 muteIcon, 
-                if (_isMuted) "Unmute" else "Mute", 
-                if (_isMuted) "Unmute" else "Mute", 
+                if (_isMuted) "Ativar Som" else "Mudo", 
+                if (_isMuted) "Ativar Som" else "Mudo", 
                 muteIntent
             ))
 

@@ -89,7 +89,7 @@ class DetailsViewModel @Inject constructor(
                 onFailure = { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = e.message ?: "Failed to load file details"
+                        error = e.message ?: "Falha ao carregar detalhes do arquivo"
                     )
                 }
             )
@@ -179,12 +179,12 @@ class DetailsViewModel @Inject constructor(
                         totalBytes = -1L,
                         downloadSpeed = 0L
                     )
-                    Toast.makeText(context, "File deleted", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Arquivo excluído", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Could not delete file", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Não foi possível excluir o arquivo", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -220,14 +220,14 @@ class DetailsViewModel @Inject constructor(
 
                 Toast.makeText(
                     context,
-                    "⬇ Downloading: ${file.fileName}",
+                    "⬇ Baixando: ${file.fileName}",
                     Toast.LENGTH_SHORT
                 ).show()
 
             } catch (e: Exception) {
                 Toast.makeText(
                     context,
-                    "Download failed: ${e.message}",
+                    "Falha no download: ${e.message}",
                     Toast.LENGTH_LONG
                 ).show()
                 _uiState.value = _uiState.value.copy(

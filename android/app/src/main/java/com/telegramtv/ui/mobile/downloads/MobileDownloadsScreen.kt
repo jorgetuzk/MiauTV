@@ -37,19 +37,19 @@ fun MobileDownloadsScreen(
     if (deleteId != null) {
         AlertDialog(
             onDismissRequest = { deleteId = null },
-            title = { Text("Delete Download") },
-            text = { Text("Are you sure you want to delete this downloaded file?") },
+            title = { Text("Excluir Download") },
+            text = { Text("Tem certeza que deseja excluir este arquivo baixado?") },
             confirmButton = {
                 TextButton(onClick = {
                     deleteId?.let { viewModel.deleteDownload(it) }
                     deleteId = null
                 }) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Excluir", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { deleteId = null }) {
-                    Text("Cancel")
+                    Text("Cancelar")
                 }
             }
         )
@@ -89,7 +89,7 @@ fun MobileDownloadsScreen(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("No downloads yet", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Nenhum download ainda", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -196,18 +196,18 @@ fun DownloadItemCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Paused • ${(progress * 100).toInt()}% • ${Formatter.formatFileSize(context, item.downloadedSize)} / ${Formatter.formatFileSize(context, item.totalSize)}",
+                        text = "Pausado • ${(progress * 100).toInt()}% • ${Formatter.formatFileSize(context, item.downloadedSize)} / ${Formatter.formatFileSize(context, item.totalSize)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MobilePrimary
                     )
                 } else {
                     Text(
                         text = when(item.status) {
-                            DownloadStatus.PENDING -> "Pending"
-                            DownloadStatus.PAUSED -> "Paused"
-                            DownloadStatus.COMPLETED -> "Completed • ${Formatter.formatFileSize(context, item.totalSize)}"
-                            DownloadStatus.FAILED -> "Failed${item.title.let { "" }}"
-                            DownloadStatus.CANCELLED -> "Cancelled"
+                            DownloadStatus.PENDING -> "Pendente"
+                            DownloadStatus.PAUSED -> "Pausado"
+                            DownloadStatus.COMPLETED -> "Concluído • ${Formatter.formatFileSize(context, item.totalSize)}"
+                            DownloadStatus.FAILED -> "Falhou${item.title.let { "" }}"
+                            DownloadStatus.CANCELLED -> "Cancelado"
                             else -> ""
                         },
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -219,14 +219,14 @@ fun DownloadItemCard(
             // Pause button for running/pending downloads
             if (item.status == DownloadStatus.RUNNING || item.status == DownloadStatus.PENDING) {
                 IconButton(onClick = onPause) {
-                    Icon(Icons.Default.Pause, "Pause", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Pause, "Pausar", tint = MaterialTheme.colorScheme.primary)
                 }
             }
 
             // Resume button for paused/failed downloads
             if (item.status == DownloadStatus.PAUSED || item.status == DownloadStatus.FAILED) {
                 IconButton(onClick = onResume) {
-                    Icon(Icons.Default.PlayArrow, "Resume", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.PlayArrow, "Retomar", tint = MaterialTheme.colorScheme.primary)
                 }
             }
 
@@ -246,24 +246,24 @@ fun DownloadItemCard(
                                 setDataAndType(contentUri, item.mimeType ?: "video/*")
                                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
-                            context.startActivity(android.content.Intent.createChooser(intent, "Open with"))
+                            context.startActivity(android.content.Intent.createChooser(intent, "Abrir com"))
                         } else {
-                            android.widget.Toast.makeText(context, "File not found", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(context, "Arquivo não encontrado", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
-                        android.widget.Toast.makeText(context, "Cannot open file: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(context, "Não foi possível abrir o arquivo: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Icon(
                         imageVector = Icons.Default.Folder,
-                        contentDescription = "Open File",
+                        contentDescription = "Abrir Arquivo",
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, "Delete", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(Icons.Default.Delete, "Excluir", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

@@ -1,69 +1,69 @@
 <resources>
     <string name="app_name">MiauTV</string>
-    
+
     <!-- Home Screen -->
-    <string name="continue_watching">Continue Watching</string>
-    <string name="recently_added">Recently Added</string>
-    <string name="all_files">All Files</string>
-    <string name="folders">Folders</string>
-    <string name="search">Search</string>
-    <string name="settings">Settings</string>
-    
+    <string name="continue_watching">Continuar Assistindo</string>
+    <string name="recently_added">Adicionados Recentemente</string>
+    <string name="all_files">Todos os Arquivos</string>
+    <string name="folders">Pastas</string>
+    <string name="search">Buscar</string>
+    <string name="settings">Configurações</string>
+
     <!-- Login -->
-    <string name="login_title">Sign In</string>
-    <string name="login_instruction">Enter this code in Telegram</string>
-    <string name="login_bot_instruction">Send /login %1$s to @YourTVBot</string>
-    <string name="login_waiting">Waiting for confirmation…</string>
-    <string name="login_success">Login successful!</string>
-    <string name="login_failed">Login failed. Please try again.</string>
-    <string name="logout">Logout</string>
-    
+    <string name="login_title">Entrar</string>
+    <string name="login_instruction">Digite este código no Telegram</string>
+    <string name="login_bot_instruction">Envie /login %1$s para @YourTVBot</string>
+    <string name="login_waiting">Aguardando confirmação…</string>
+    <string name="login_success">Login realizado com sucesso!</string>
+    <string name="login_failed">Falha no login. Tente novamente.</string>
+    <string name="logout">Sair</string>
+
     <!-- Player -->
-    <string name="play">Play</string>
-    <string name="pause">Pause</string>
-    <string name="resume">Resume</string>
-    <string name="seek_backward">Rewind 10 seconds</string>
-    <string name="seek_forward">Fast forward 10 seconds</string>
-    <string name="loading">Loading…</string>
-    <string name="buffering">Buffering…</string>
-    <string name="error_playback">Playback error: %1$s</string>
-    
+    <string name="play">Reproduzir</string>
+    <string name="pause">Pausar</string>
+    <string name="resume">Retomar</string>
+    <string name="seek_backward">Voltar 10 segundos</string>
+    <string name="seek_forward">Avançar 10 segundos</string>
+    <string name="loading">Carregando…</string>
+    <string name="buffering">Carregando buffer…</string>
+    <string name="error_playback">Erro de reprodução: %1$s</string>
+
     <!-- File Details -->
-    <string name="file_size">Size</string>
-    <string name="file_duration">Duration</string>
-    <string name="file_resolution">Resolution</string>
-    <string name="file_type">Type</string>
-    <string name="file_added">Added</string>
-    <string name="play_from_beginning">Play from Beginning</string>
-    <string name="resume_playback">Resume from %1$s</string>
-    
+    <string name="file_size">Tamanho</string>
+    <string name="file_duration">Duração</string>
+    <string name="file_resolution">Resolução</string>
+    <string name="file_type">Tipo</string>
+    <string name="file_added">Adicionado</string>
+    <string name="play_from_beginning">Reproduzir do Início</string>
+    <string name="resume_playback">Retomar de %1$s</string>
+
     <!-- Settings -->
-    <string name="settings_server">Server Settings</string>
-    <string name="settings_server_url">Server URL</string>
+    <string name="settings_server">Configurações do Servidor</string>
+    <string name="settings_server_url">URL do Servidor</string>
     <string name="settings_server_url_hint">http://192.168.1.100:8000</string>
-    <string name="settings_playback">Playback</string>
-    <string name="settings_quality">Preferred Quality</string>
-    <string name="settings_auto_play_next">Auto-play next file</string>
-    <string name="settings_account">Account</string>
-    <string name="settings_about">About</string>
-    <string name="settings_version">Version</string>
-    
+    <string name="settings_playback">Reprodução</string>
+    <string name="settings_quality">Qualidade Preferida</string>
+    <string name="settings_auto_play_next">Reproduzir próximo arquivo automaticamente</string>
+    <string name="settings_account">Conta</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_version">Versão</string>
+
     <!-- Errors -->
-    <string name="error_network">Network error. Please check your connection.</string>
-    <string name="error_server">Server error. Please try again later.</string>
-    <string name="error_auth">Authentication failed. Please login again.</string>
-    <string name="error_file_not_found">File not found.</string>
-    <string name="error_unknown">An unexpected error occurred.</string>
-    <string name="retry">Retry</string>
-    
+    <string name="error_network">Erro de rede. Verifique sua conexão.</string>
+    <string name="error_server">Erro no servidor. Tente novamente mais tarde.</string>
+    <string name="error_auth">Falha na autenticação. Faça login novamente.</string>
+    <string name="error_file_not_found">Arquivo não encontrado.</string>
+    <string name="error_unknown">Ocorreu um erro inesperado.</string>
+    <string name="retry">Tentar Novamente</string>
+
     <!-- Empty States -->
-    <string name="empty_files">No files yet</string>
-    <string name="empty_files_hint">Upload files via Telegram bot to get started</string>
-    <string name="empty_folder">This folder is empty</string>
-    <string name="empty_search">No results found</string>
-    
+    <string name="empty_files">Nenhum arquivo ainda</string>
+    <string name="empty_files_hint">Envie arquivos pelo bot do Telegram para começar</string>
+    <string name="empty_folder">Esta pasta está vazia</string>
+    <string name="empty_search">Nenhum resultado encontrado</string>
+
     <!-- Misc -->
     <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="save">Save</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Salvar</string>
 </resources>

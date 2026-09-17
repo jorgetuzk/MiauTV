@@ -52,10 +52,10 @@ data class TrackInfo(
  * Subtitle size options.
  */
 enum class SubtitleSize(val displayName: String, val scale: Float) {
-    SMALL("Small", 0.7f),
-    MEDIUM("Medium", 1.0f),
-    LARGE("Large", 1.4f),
-    EXTRA_LARGE("Extra Large", 1.8f)
+    SMALL("Pequeno", 0.7f),
+    MEDIUM("Médio", 1.0f),
+    LARGE("Grande", 1.4f),
+    EXTRA_LARGE("Extra Grande", 1.8f)
 }
 
 /**
@@ -289,9 +289,9 @@ class PlayerViewModel @Inject constructor(
             cause.contains("NO_EXCEEDS_CAPABILITIES", ignoreCase = true) -> {
                 val codecInfo = extractCodecInfo(message + cause)
                 PlaybackError(
-                    title = "Format Not Supported",
-                    description = "This video uses $codecInfo which your device cannot play. " +
-                            "Try a different video or use a device with better codec support.",
+                    title = "Formato Não Suportado",
+                    description = "Este vídeo usa $codecInfo, que seu dispositivo não consegue reproduzir. " +
+                            "Tente outro vídeo ou use um dispositivo com melhor suporte a codecs.",
                     technicalDetails = fullDetails,
                     canRetry = false,
                     errorType = ErrorType.CODEC_NOT_SUPPORTED
@@ -303,8 +303,8 @@ class PlayerViewModel @Inject constructor(
             message.contains("Unable to connect", ignoreCase = true) ||
             message.contains("timeout", ignoreCase = true) -> {
                 PlaybackError(
-                    title = "Connection Error",
-                    description = "Could not connect to the server. Please check your internet connection and try again.",
+                    title = "Erro de Conexão",
+                    description = "Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.",
                     technicalDetails = fullDetails,
                     canRetry = true,
                     errorType = ErrorType.NETWORK_ERROR
@@ -315,8 +315,8 @@ class PlayerViewModel @Inject constructor(
             message.contains("403", ignoreCase = true) ||
             message.contains("Unauthorized", ignoreCase = true) -> {
                 PlaybackError(
-                    title = "Authentication Error",
-                    description = "Your session has expired. Please go back and try again, or re-login.",
+                    title = "Erro de Autenticação",
+                    description = "Sua sessão expirou. Volte e tente novamente, ou faça login de novo.",
                     technicalDetails = fullDetails,
                     canRetry = true,
                     errorType = ErrorType.AUTH_ERROR
@@ -326,8 +326,8 @@ class PlayerViewModel @Inject constructor(
             message.contains("404", ignoreCase = true) ||
             message.contains("not found", ignoreCase = true) -> {
                 PlaybackError(
-                    title = "File Not Found",
-                    description = "This file is no longer available or may have been deleted.",
+                    title = "Arquivo Não Encontrado",
+                    description = "Este arquivo não está mais disponível ou pode ter sido excluído.",
                     technicalDetails = fullDetails,
                     canRetry = false,
                     errorType = ErrorType.FILE_NOT_FOUND
@@ -336,8 +336,8 @@ class PlayerViewModel @Inject constructor(
             // Generic error
             else -> {
                 PlaybackError(
-                    title = "Playback Error",
-                    description = "An error occurred while playing this file.",
+                    title = "Erro de Reprodução",
+                    description = "Ocorreu um erro ao reproduzir este arquivo.",
                     technicalDetails = fullDetails,
                     canRetry = true,
                     errorType = ErrorType.UNKNOWN
@@ -365,7 +365,7 @@ class PlayerViewModel @Inject constructor(
             message.contains("av1", ignoreCase = true) -> "AV1"
             message.contains("vp9", ignoreCase = true) -> "VP9"
             message.contains("dolby", ignoreCase = true) -> "Dolby Vision"
-            else -> "an advanced video format"
+            else -> "um formato de vídeo avançado"
         }
     }
 
@@ -391,7 +391,7 @@ class PlayerViewModel @Inject constructor(
                         audioTracks.add(TrackInfo(
                             index = trackIndex,
                             groupIndex = groupIndex,
-                            name = getTrackName(format, audioTracks.size + 1, "Audio"),
+                            name = getTrackName(format, audioTracks.size + 1, "Áudio"),
                             language = format.language,
                             isSelected = isSelected
                         ))
@@ -401,7 +401,7 @@ class PlayerViewModel @Inject constructor(
                         subtitleTracks.add(TrackInfo(
                             index = trackIndex,
                             groupIndex = groupIndex,
-                            name = getTrackName(format, subtitleTracks.size + 1, "Subtitle"),
+                            name = getTrackName(format, subtitleTracks.size + 1, "Legenda"),
                             language = format.language,
                             isSelected = isSelected
                         ))
@@ -429,7 +429,7 @@ class PlayerViewModel @Inject constructor(
         return when {
             label != null -> label
             language != null -> language
-            else -> "$type Track $index"
+            else -> "$type $index"
         }
     }
 
@@ -595,8 +595,8 @@ class PlayerViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = PlaybackError(
-                            title = "Failed to Load",
-                            description = e.message ?: "Could not load file information",
+                            title = "Falha ao Carregar",
+                            description = e.message ?: "Não foi possível carregar as informações do arquivo",
                             technicalDetails = null,
                             canRetry = true,
                             errorType = ErrorType.UNKNOWN

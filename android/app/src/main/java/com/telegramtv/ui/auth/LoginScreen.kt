@@ -120,7 +120,7 @@ fun LoginScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Server Settings",
+                    contentDescription = "Configurações do Servidor",
                     tint = if (uiState.showServerConfig) TVPrimary else TVTextSecondary.copy(alpha = 0.5f),
                     modifier = Modifier.size(20.dp)
                 )
@@ -155,7 +155,7 @@ fun LoginScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Server URL",
+                            text = "URL do Servidor",
                             style = MaterialTheme.typography.labelMedium,
                             color = TVTextSecondary,
                             fontWeight = FontWeight.Medium
@@ -207,7 +207,7 @@ fun LoginScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         TVButton(
-                            text = "Save & Restart",
+                            text = "Salvar e Reiniciar",
                             onClick = { viewModel.saveAndRestart() },
                             isPrimary = true
                         )
@@ -227,7 +227,7 @@ fun LoginScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "Generating login code...",
+                        text = "Gerando código de login...",
                         style = MaterialTheme.typography.titleMedium,
                         color = TVTextSecondary
                     )
@@ -256,7 +256,7 @@ fun LoginScreen(
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                     TVButton(
-                        text = "Try Again",
+                        text = "Tentar Novamente",
                         onClick = { viewModel.generateLoginCode() }
                     )
                 }
@@ -264,7 +264,7 @@ fun LoginScreen(
                 uiState.loginCode != null -> {
                     // Instruction
                     Text(
-                        text = "Enter this code in Telegram",
+                        text = "Digite este código no Telegram",
                         style = MaterialTheme.typography.titleLarge,
                         color = TVTextSecondary
                     )
@@ -321,7 +321,7 @@ fun LoginScreen(
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = "Send /login ${uiState.loginCode} to your Bot",
+                                text = "Envie /login ${uiState.loginCode} para o seu Bot",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = TVTextPrimary
                             )
@@ -363,7 +363,7 @@ fun LoginScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Waiting for confirmation",
+                                text = "Aguardando confirmação",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = TVTextSecondary
                             )
@@ -378,7 +378,7 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     TVButton(
-                        text = "Generate New Code",
+                        text = "Gerar Novo Código",
                         onClick = { viewModel.generateLoginCode() },
                         isPrimary = false
                     )

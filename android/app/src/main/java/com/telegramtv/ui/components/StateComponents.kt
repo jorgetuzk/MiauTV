@@ -27,7 +27,7 @@ import com.telegramtv.ui.theme.*
 @Composable
 fun LoadingIndicator(
     modifier: Modifier = Modifier,
-    message: String = "Loading..."
+    message: String = "Carregando..."
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -134,7 +134,7 @@ fun ErrorState(
         Spacer(modifier = Modifier.height(32.dp))
 
         TVButton(
-            text = "Retry",
+            text = "Tentar Novamente",
             onClick = onRetry
         )
     }

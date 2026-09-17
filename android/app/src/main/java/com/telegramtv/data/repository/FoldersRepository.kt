@@ -26,7 +26,7 @@ class FoldersRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to fetch folders"))
+                Result.failure(Exception("Falha ao buscar pastas"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -42,7 +42,7 @@ class FoldersRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Folder not found"))
+                Result.failure(Exception("Pasta não encontrada"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -59,7 +59,7 @@ class FoldersRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to create folder"))
+                Result.failure(Exception("Falha ao criar pasta"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -76,7 +76,7 @@ class FoldersRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to update folder"))
+                Result.failure(Exception("Falha ao atualizar pasta"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -92,7 +92,7 @@ class FoldersRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to delete folder"))
+                Result.failure(Exception("Falha ao excluir pasta"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -108,7 +108,7 @@ class FoldersRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to fetch folder tree"))
+                Result.failure(Exception("Falha ao buscar árvore de pastas"))
             }
         } catch (e: Exception) {
             Result.failure(e)

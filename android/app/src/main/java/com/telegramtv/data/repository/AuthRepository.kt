@@ -124,7 +124,7 @@ class AuthRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                val errorMsg = response.errorBody()?.string() ?: "Unknown error"
+                val errorMsg = response.errorBody()?.string() ?: "Erro desconhecido"
                 Result.failure(Exception("HTTP ${response.code()}: $errorMsg"))
             }
         } catch (e: Exception) {
@@ -145,10 +145,10 @@ class AuthRepository @Inject constructor(
                 Result.success(auth)
             } else {
                 when (response.code()) {
-                    404 -> Result.failure(Exception("Code not yet confirmed"))
-                    410 -> Result.failure(Exception("Code expired"))
-                    429 -> Result.failure(Exception("Too many requests. Please wait a moment."))
-                    else -> Result.failure(Exception("Verification failed"))
+                    404 -> Result.failure(Exception("Código ainda não confirmado"))
+                    410 -> Result.failure(Exception("Código expirado"))
+                    429 -> Result.failure(Exception("Muitas requisições. Aguarde um instante."))
+                    else -> Result.failure(Exception("Falha na verificação"))
                 }
             }
         } catch (e: Exception) {
@@ -177,7 +177,7 @@ class AuthRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Failed to fetch bot info"))
+                Result.failure(Exception("Falha ao buscar informações do bot"))
             }
         } catch (e: Exception) {
             Result.failure(e)

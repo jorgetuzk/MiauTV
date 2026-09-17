@@ -437,14 +437,14 @@ private fun LoadingOverlay() {
             )
             Spacer(modifier = Modifier.height(28.dp))
             Text(
-                text = "Preparing video...",
+                text = "Preparando vídeo...",
                 style = MaterialTheme.typography.titleLarge,
                 color = TVTextPrimary,
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Connecting to stream",
+                text = "Conectando ao stream",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TVTextSecondary.copy(alpha = 0.6f)
             )
@@ -526,7 +526,7 @@ private fun ErrorOverlay(
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(onClick = { showDetails = !showDetails }) {
                     Text(
-                        text = if (showDetails) "Hide details" else "Show technical details",
+                        text = if (showDetails) "Ocultar detalhes" else "Mostrar detalhes técnicos",
                         color = TVTextSecondary.copy(alpha = 0.7f),
                         fontSize = 12.sp
                     )
@@ -552,7 +552,7 @@ private fun ErrorOverlay(
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 PlayerActionButton(
-                    text = "Go Back",
+                    text = "Voltar",
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
                     onClick = onBack,
                     isPrimary = !error.canRetry,
@@ -560,7 +560,7 @@ private fun ErrorOverlay(
                 )
                 
                 PlayerActionButton(
-                    text = "External Player",
+                    text = "Player Externo",
                     icon = Icons.AutoMirrored.Filled.OpenInNew,
                     onClick = onExternalPlayer,
                     isPrimary = false
@@ -568,7 +568,7 @@ private fun ErrorOverlay(
                 
                 if (error.canRetry) {
                     PlayerActionButton(
-                        text = "Retry",
+                        text = "Tentar Novamente",
                         icon = Icons.Default.Refresh,
                         onClick = onRetry,
                         isPrimary = true
@@ -673,7 +673,7 @@ private fun PlayerControls(
         ) {
             ControlIconButton(
                 icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = "Voltar",
                 onClick = onBack,
                 size = 48.dp
             )
@@ -705,7 +705,7 @@ private fun PlayerControls(
             // Speed button
             ControlIconButton(
                 icon = Icons.Default.Speed,
-                contentDescription = "Speed",
+                contentDescription = "Velocidade",
                 onClick = onSpeedCycle,
                 size = 44.dp
             )
@@ -715,7 +715,7 @@ private fun PlayerControls(
             // Jump button
             ControlIconButton(
                 icon = Icons.Default.Timer,
-                contentDescription = "Jump to time",
+                contentDescription = "Pular para o tempo",
                 onClick = onJumpTo,
                 size = 44.dp
             )
@@ -724,7 +724,7 @@ private fun PlayerControls(
                 Spacer(modifier = Modifier.width(8.dp))
                 ControlIconButton(
                     icon = Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = "Configurações",
                     onClick = onSettings,
                     size = 44.dp
                 )
@@ -772,7 +772,7 @@ private fun PlayerControls(
             ) {
                 ControlIconButton(
                     icon = Icons.Default.Replay10,
-                    contentDescription = "Rewind",
+                    contentDescription = "Retroceder",
                     onClick = onSeekBackward,
                     size = 56.dp,
                     iconSize = 32.dp
@@ -789,7 +789,7 @@ private fun PlayerControls(
 
                 ControlIconButton(
                     icon = Icons.Default.Forward10,
-                    contentDescription = "Forward",
+                    contentDescription = "Avançar",
                     onClick = onSeekForward,
                     size = 56.dp,
                     iconSize = 32.dp
@@ -799,7 +799,7 @@ private fun PlayerControls(
             // Keyboard shortcut hint
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Hold ◀▶ to fast seek  •  0-9 jump to %",
+                text = "Segure ◀▶ para busca rápida  •  0-9 pula para %",
                 style = MaterialTheme.typography.bodySmall,
                 color = TVTextSecondary.copy(alpha = 0.4f),
                 textAlign = TextAlign.Center,
@@ -966,7 +966,7 @@ private fun PlayPauseButton(
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                contentDescription = if (isPlaying) "Pause" else "Play",
+                contentDescription = if (isPlaying) "Pausar" else "Reproduzir",
                 tint = Color.White,
                 modifier = Modifier.size(48.dp)
             )
@@ -1054,14 +1054,14 @@ private fun JumpToPositionDialog(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Jump to Time",
+                    text = "Pular para o Tempo",
                     style = MaterialTheme.typography.titleLarge,
                     color = TVTextPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Duration: $durationText",
+                    text = "Duração: $durationText",
                     style = MaterialTheme.typography.bodySmall,
                     color = TVTextSecondary
                 )
@@ -1100,7 +1100,7 @@ private fun JumpToPositionDialog(
 
                 // Quick jump buttons
                 Text(
-                    text = "Quick Jump",
+                    text = "Pulo Rápido",
                     style = MaterialTheme.typography.labelMedium,
                     color = TVTextSecondary,
                     modifier = Modifier.fillMaxWidth()
@@ -1129,13 +1129,13 @@ private fun JumpToPositionDialog(
                 // Action buttons
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     PlayerActionButton(
-                        text = "Cancel",
+                        text = "Cancelar",
                         icon = Icons.Default.Close,
                         onClick = onDismiss,
                         isPrimary = false
                     )
                     PlayerActionButton(
-                        text = "Jump",
+                        text = "Pular",
                         icon = Icons.Default.PlayArrow,
                         onClick = {
                             val h = hours.toIntOrNull() ?: 0
@@ -1311,7 +1311,7 @@ private fun SettingsPanel(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "Settings",
+                            text = "Configurações",
                             style = MaterialTheme.typography.titleLarge,
                             color = TVTextPrimary,
                             fontWeight = FontWeight.Bold
@@ -1328,7 +1328,7 @@ private fun SettingsPanel(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // Playback speed section
-                    SettingsSectionLabel(title = "Playback Speed", icon = Icons.Default.Speed)
+                    SettingsSectionLabel(title = "Velocidade de Reprodução", icon = Icons.Default.Speed)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -1347,7 +1347,7 @@ private fun SettingsPanel(
 
                     // Audio section
                     if (audioTracks.isNotEmpty()) {
-                        SettingsSectionLabel(title = "Audio Track", icon = Icons.AutoMirrored.Filled.VolumeUp)
+                        SettingsSectionLabel(title = "Faixa de Áudio", icon = Icons.AutoMirrored.Filled.VolumeUp)
                         audioTracks.forEach { track ->
                             FocusableTrackItem(
                                 name = track.name,
@@ -1361,10 +1361,10 @@ private fun SettingsPanel(
 
                     // Subtitle section
                     if (subtitleTracks.isNotEmpty()) {
-                        SettingsSectionLabel(title = "Subtitles", icon = Icons.Default.Subtitles)
+                        SettingsSectionLabel(title = "Legendas", icon = Icons.Default.Subtitles)
                         FocusableTrackItem(
-                            name = "Off",
-                            subtitle = "Disable subtitles",
+                            name = "Desativada",
+                            subtitle = "Desativar legendas",
                             isSelected = !subtitlesEnabled,
                             onClick = { onSelectSubtitle(null) }
                         )
@@ -1379,7 +1379,7 @@ private fun SettingsPanel(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Subtitle size
-                        SettingsSectionLabel(title = "Text Size", icon = Icons.Default.FormatSize)
+                        SettingsSectionLabel(title = "Tamanho do Texto", icon = Icons.Default.FormatSize)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -1474,7 +1474,7 @@ private fun FocusableCloseButton(onClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Default.Close,
-            contentDescription = "Close",
+            contentDescription = "Fechar",
             tint = if (isFocused) Color.White else TVTextSecondary,
             modifier = Modifier.size(20.dp)
         )
@@ -1554,7 +1554,7 @@ private fun FocusableTrackItem(
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
-                    contentDescription = "Selected",
+                    contentDescription = "Selecionado",
                     tint = if (isFocused) Color.White else TVPrimary,
                     modifier = Modifier.size(24.dp)
                 )

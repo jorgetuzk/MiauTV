@@ -74,7 +74,7 @@ fun MobileSearchScreen(
                 ) {
                     Icon(
                         Icons.Default.Search,
-                        contentDescription = "Search",
+                        contentDescription = "Buscar",
                         tint = MobileTextSecondary
                     )
                     
@@ -86,7 +86,7 @@ fun MobileSearchScreen(
                 Log.d("MobileSearchScreen", "Query changed: $it")
                 viewModel.onQueryChange(it) 
             },
-            placeholder = { Text("Search files...", color = MobileTextSecondary) },
+            placeholder = { Text("Buscar arquivos...", color = MobileTextSecondary) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -103,7 +103,7 @@ fun MobileSearchScreen(
                     
                     if (uiState.query.isNotEmpty()) {
                         IconButton(onClick = { viewModel.onQueryChange("") }) {
-                            Icon(Icons.Default.Close, "Clear", tint = MobileTextSecondary)
+                            Icon(Icons.Default.Close, "Limpar", tint = MobileTextSecondary)
                         }
                     }
                 }
@@ -121,9 +121,9 @@ fun MobileSearchScreen(
         } else if (uiState.results.isEmpty()) {
              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (uiState.query.isNotEmpty()) {
-                    Text("No results found for \"${uiState.query}\"", color = MobileTextSecondary)
+                    Text("Nenhum resultado encontrado para \"${uiState.query}\"", color = MobileTextSecondary)
                 } else {
-                    Text("Type to search", color = MobileTextSecondary)
+                    Text("Digite para buscar", color = MobileTextSecondary)
                 }
             }
         } else {
@@ -162,7 +162,7 @@ fun MobileSearchScreen(
     // --- Dialogs ---
     if (showRenameFileDialog != null) {
         InputDialog(
-            title = "Rename File",
+            title = "Renomear Arquivo",
             initialValue = showRenameFileDialog!!.fileName,
             onDismiss = { showRenameFileDialog = null },
             onConfirm = { newName ->
@@ -175,19 +175,19 @@ fun MobileSearchScreen(
     if (showDeleteFileDialog != null) {
         AlertDialog(
             onDismissRequest = { showDeleteFileDialog = null },
-            title = { Text("Delete File") },
-            text = { Text("Are you sure you want to delete '${showDeleteFileDialog!!.fileName}'?") },
+            title = { Text("Excluir Arquivo") },
+            text = { Text("Tem certeza que deseja excluir '${showDeleteFileDialog!!.fileName}'?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteFile(showDeleteFileDialog!!)
                     showDeleteFileDialog = null
                 }) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Excluir", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteFileDialog = null }) {
-                    Text("Cancel")
+                    Text("Cancelar")
                 }
             }
         )
@@ -195,7 +195,7 @@ fun MobileSearchScreen(
 
     if (showMoveFileDialog != null) {
         MovePickerDialog(
-            title = "Move File",
+            title = "Mover Arquivo",
             currentFolderId = showMoveFileDialog!!.folderId,
             folders = uiState.folders,
             onDismiss = { showMoveFileDialog = null },

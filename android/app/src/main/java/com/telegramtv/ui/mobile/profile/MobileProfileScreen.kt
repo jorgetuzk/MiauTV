@@ -85,13 +85,13 @@ fun MobileProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = userName ?: "Guest",
+                    text = userName ?: "Convidado",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MobileTextPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = serverUrl ?: "No Server",
+                    text = serverUrl ?: "Nenhum Servidor",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MobileTextSecondary
                 )
@@ -101,7 +101,7 @@ fun MobileProfileScreen(
         // Options
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "General Settings",
+                text = "Configurações Gerais",
                 style = MaterialTheme.typography.titleMedium,
                 color = MobilePrimary,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -109,7 +109,7 @@ fun MobileProfileScreen(
             
             ProfileMenuItem(
                 icon = Icons.Default.Settings,
-                title = "App Settings",
+                title = "Configurações do App",
                 onClick = { /* TODO: Open Settings */ }
             )
             
@@ -117,7 +117,7 @@ fun MobileProfileScreen(
             
             ProfileMenuItem(
                 icon = Icons.Default.CleaningServices,
-                title = "Clear Cache",
+                title = "Limpar Cache",
                 onClick = { 
                     // Simple cache clear
                 }
@@ -127,7 +127,7 @@ fun MobileProfileScreen(
 
             ProfileMenuItem(
                 icon = Icons.AutoMirrored.Filled.ExitToApp,
-                title = "Logout",
+                title = "Sair",
                 onClick = { viewModel.logout(onLogout) }
             )
         }
@@ -135,7 +135,7 @@ fun MobileProfileScreen(
         Spacer(modifier = Modifier.weight(1f))
         
         Text(
-            text = "Version 1.0.0",
+            text = "Versão 1.0.0",
             style = MaterialTheme.typography.labelSmall,
             color = MobileTextSecondary,
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)

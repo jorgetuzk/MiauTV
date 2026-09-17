@@ -111,7 +111,7 @@ fun MobileHomeScreen(
             // 2. Continue Watching (Only on Root)
             if (uiState.currentFolderId == null && uiState.continueWatching.isNotEmpty()) {
                 item {
-                    SectionHeader("Continue Watching")
+                    SectionHeader("Continuar Assistindo")
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -130,7 +130,7 @@ fun MobileHomeScreen(
             // 3. Recent Files (Only on Root)
             if (uiState.currentFolderId == null && uiState.recentFiles.isNotEmpty()) {
                 item {
-                    SectionHeader("Recently Added")
+                    SectionHeader("Adicionados Recentemente")
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -156,7 +156,7 @@ fun MobileHomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (uiState.currentFolderId == null) "Your Files" else uiState.currentFolderName,
+                        text = if (uiState.currentFolderId == null) "Meus Arquivos" else uiState.currentFolderName,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold
@@ -171,7 +171,7 @@ fun MobileHomeScreen(
                         ) {
                             Icon(
                                 Icons.Default.CreateNewFolder,
-                                contentDescription = "New Folder",
+                                contentDescription = "Nova Pasta",
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -229,7 +229,7 @@ fun MobileHomeScreen(
             if (uiState.folders.isEmpty() && uiState.files.isEmpty() && !uiState.isLoading) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Text("No files here", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Nenhum arquivo aqui", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -256,7 +256,7 @@ fun MobileHomeScreen(
     // --- DIALOGS ---
     if (showCreateFolderDialog) {
         InputDialog(
-            title = "New Folder",
+            title = "Nova Pasta",
             onDismiss = { showCreateFolderDialog = false },
             onConfirm = { 
                 viewModel.createFolder(it); showCreateFolderDialog = false 
@@ -266,7 +266,7 @@ fun MobileHomeScreen(
     
     if (showRenameFileDialog != null) {
         InputDialog(
-            title = "Rename File",
+            title = "Renomear Arquivo",
             initialValue = showRenameFileDialog!!.fileName,
             onDismiss = { showRenameFileDialog = null },
             onConfirm = { newName ->
@@ -279,19 +279,19 @@ fun MobileHomeScreen(
     if (showDeleteFileDialog != null) {
         AlertDialog(
             onDismissRequest = { showDeleteFileDialog = null },
-            title = { Text("Delete File") },
-            text = { Text("Are you sure you want to delete '${showDeleteFileDialog!!.fileName}'?") },
+            title = { Text("Excluir Arquivo") },
+            text = { Text("Tem certeza que deseja excluir '${showDeleteFileDialog!!.fileName}'?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteFile(showDeleteFileDialog!!)
                     showDeleteFileDialog = null
                 }) {
-                    Text("Delete")
+                    Text("Excluir")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteFileDialog = null }) {
-                    Text("Cancel")
+                    Text("Cancelar")
                 }
             }
         )
@@ -300,19 +300,19 @@ fun MobileHomeScreen(
     if (showDeleteFolderDialog != null) {
         AlertDialog(
             onDismissRequest = { showDeleteFolderDialog = null },
-            title = { Text("Delete Folder") },
-            text = { Text("Are you sure you want to delete '${showDeleteFolderDialog!!.name}'?") },
+            title = { Text("Excluir Pasta") },
+            text = { Text("Tem certeza que deseja excluir '${showDeleteFolderDialog!!.name}'?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteFolder(showDeleteFolderDialog!!)
                     showDeleteFolderDialog = null
                 }) {
-                    Text("Delete")
+                    Text("Excluir")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteFolderDialog = null }) {
-                    Text("Cancel")
+                    Text("Cancelar")
                 }
             }
         )
@@ -320,7 +320,7 @@ fun MobileHomeScreen(
     
     if (showMoveFileDialog != null) {
         MovePickerDialog(
-            title = "Move File",
+            title = "Mover Arquivo",
             currentFolderId = uiState.currentFolderId,
             folders = uiState.folders,
             onDismiss = { showMoveFileDialog = null },
@@ -333,7 +333,7 @@ fun MobileHomeScreen(
     
     if (showMoveFolderDialog != null) {
         MovePickerDialog(
-            title = "Move Folder",
+            title = "Mover Pasta",
             currentFolderId = uiState.currentFolderId,
             folders = uiState.folders,
             onDismiss = { showMoveFolderDialog = null },
@@ -347,19 +347,19 @@ fun MobileHomeScreen(
     if (showDeleteSelectedDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteSelectedDialog = false },
-            title = { Text("Delete Items") },
-            text = { Text("Are you sure you want to delete ${uiState.selectedFileIds.size + uiState.selectedFolderIds.size} items?") },
+            title = { Text("Excluir Itens") },
+            text = { Text("Tem certeza que deseja excluir ${uiState.selectedFileIds.size + uiState.selectedFolderIds.size} itens?") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteSelected()
                     showDeleteSelectedDialog = false
                 }) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Excluir", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteSelectedDialog = false }) {
-                    Text("Cancel")
+                    Text("Cancelar")
                 }
             }
         )
@@ -367,7 +367,7 @@ fun MobileHomeScreen(
 
     if (showMoveSelectedDialog) {
         MovePickerDialog(
-            title = "Move Items",
+            title = "Mover Itens",
             currentFolderId = uiState.currentFolderId,
             folders = uiState.folders,
             onDismiss = { showMoveSelectedDialog = false },
@@ -381,20 +381,20 @@ fun MobileHomeScreen(
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Logout") },
-            text = { Text("Are you sure you want to logout?") },
+            title = { Text("Sair") },
+            text = { Text("Tem certeza que deseja sair?") },
             confirmButton = {
                 TextButton(onClick = {
                     showLogoutDialog = false
                     viewModel.logout()
                     onLogout()
                 }) {
-                    Text("Logout")
+                    Text("Sair")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancel")
+                    Text("Cancelar")
                 }
             }
         )
@@ -423,21 +423,21 @@ fun SelectionActionBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, "Clear selection")
+                Icon(Icons.Default.Close, "Limpar seleção")
             }
             
             Text(
-                text = "$selectedCount selected",
+                text = "$selectedCount selecionado(s)",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f).padding(start = 16.dp)
             )
             
             IconButton(onClick = onMove) {
-                Icon(Icons.AutoMirrored.Filled.DriveFileMove, "Move selected")
+                Icon(Icons.AutoMirrored.Filled.DriveFileMove, "Mover selecionados")
             }
             
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, "Delete selected", tint = MaterialTheme.colorScheme.error)
+                Icon(Icons.Default.Delete, "Excluir selecionados", tint = MaterialTheme.colorScheme.error)
             }
         }
     }
@@ -454,10 +454,10 @@ fun HomeHeader(
     val greeting = remember {
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
         when (hour) {
-            in 5..11 -> "Good Morning"
-            in 12..16 -> "Good Afternoon"
-            in 17..20 -> "Good Evening"
-            else -> "Good Night"
+            in 5..11 -> "Bom Dia"
+            in 12..16 -> "Boa Tarde"
+            in 17..20 -> "Boa Noite"
+            else -> "Boa Noite"
         }
     }
 
@@ -489,7 +489,7 @@ fun HomeHeader(
             )
             if (folderName == "Home") {
                 Text(
-                    text = "Welcome back to MiauTV",
+                    text = "Bem-vindo de volta ao MiauTV",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -505,10 +505,10 @@ fun HomeHeader(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             IconButton(onClick = onSearchClick) {
-                Icon(Icons.Default.Search, "Search", tint = MaterialTheme.colorScheme.onBackground)
+                Icon(Icons.Default.Search, "Buscar", tint = MaterialTheme.colorScheme.onBackground)
             }
             IconButton(onClick = onLogoutClick) {
-                Icon(Icons.AutoMirrored.Filled.ExitToApp, "Logout", tint = MaterialTheme.colorScheme.onBackground)
+                Icon(Icons.AutoMirrored.Filled.ExitToApp, "Sair", tint = MaterialTheme.colorScheme.onBackground)
             }
         }
     }
@@ -556,7 +556,7 @@ fun ContinueWatchingCard(file: FileItem, serverUrl: String, onClick: (Int) -> Un
             // Play Icon
             Icon(
                 Icons.Default.PlayCircle,
-                contentDescription = "Play",
+                contentDescription = "Reproduzir",
                 tint = Color.White,
                 modifier = Modifier.align(Alignment.Center).size(48.dp)
             )
@@ -649,9 +649,9 @@ fun FolderCard(
                 contentAlignment = Alignment.Center
             ) {
                 if (isSelected) {
-                    Icon(Icons.Default.CheckCircle, "Selected", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.CheckCircle, "Selecionado", tint = MaterialTheme.colorScheme.primary)
                 } else {
-                    Icon(Icons.Default.Folder, "Folder", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Folder, "Pasta", tint = MaterialTheme.colorScheme.primary)
                 }
             }
             
@@ -664,7 +664,7 @@ fun FolderCard(
                     style = MaterialTheme.typography.titleSmall
                 )
                 Text(
-                    text = "Folder",
+                    text = "Pasta",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -717,7 +717,7 @@ fun FileCard(
                 contentAlignment = Alignment.Center
             ) {
                 if (isSelected) {
-                    Icon(Icons.Default.CheckCircle, "Selected", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.CheckCircle, "Selecionado", tint = MaterialTheme.colorScheme.primary)
                 } else {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)

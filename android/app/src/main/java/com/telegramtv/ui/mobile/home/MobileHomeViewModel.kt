@@ -118,7 +118,7 @@ class MobileHomeViewModel @Inject constructor(
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Failed to load content"
+                        error = "Falha ao carregar conteúdo"
                     )
                 }
             } else {
@@ -134,7 +134,7 @@ class MobileHomeViewModel @Inject constructor(
                 } else {
                      _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Failed to load folder"
+                        error = "Falha ao carregar pasta"
                     )
                 }
             }
@@ -286,7 +286,7 @@ class MobileHomeViewModel @Inject constructor(
                 }
                 context.startActivity(intent)
             } catch (e: Exception) {
-                Toast.makeText(context, "No external player found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Nenhum player externo encontrado", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -297,10 +297,10 @@ class MobileHomeViewModel @Inject constructor(
             val publicLinkResult = filesRepository.getPublicLink(file.id, serverUrl)
             
             publicLinkResult.onSuccess { url ->
-                copyToClipboard("Public Link", url)
-                Toast.makeText(context, "Public link copied to clipboard", Toast.LENGTH_SHORT).show()
+                copyToClipboard("Link Público", url)
+                Toast.makeText(context, "Link público copiado para a área de transferência", Toast.LENGTH_SHORT).show()
             }.onFailure {
-                Toast.makeText(context, "Failed to generate public link", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Falha ao gerar link público", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -308,10 +308,10 @@ class MobileHomeViewModel @Inject constructor(
     fun revokePublicLink(file: FileItem) {
         viewModelScope.launch {
             filesRepository.revokeShare(file.id).onSuccess {
-                Toast.makeText(context, "Public link revoked", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Link público revogado", Toast.LENGTH_SHORT).show()
                 refresh()
             }.onFailure {
-                Toast.makeText(context, "Failed to revoke public link", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Falha ao revogar link público", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -325,8 +325,8 @@ class MobileHomeViewModel @Inject constructor(
             } else {
                 "$serverUrl/api/stream/${file.id}"
             }
-            copyToClipboard("Download Link", downloadUrl)
-            Toast.makeText(context, "Download link copied to clipboard", Toast.LENGTH_SHORT).show()
+            copyToClipboard("Link de Download", downloadUrl)
+            Toast.makeText(context, "Link de download copiado para a área de transferência", Toast.LENGTH_SHORT).show()
         }
     }
 

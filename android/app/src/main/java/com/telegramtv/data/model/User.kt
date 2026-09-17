@@ -19,6 +19,6 @@ data class User(
             firstName != null && lastName != null -> "$firstName $lastName"
             firstName != null -> firstName
             username != null -> "@$username"
-            else -> "User $telegramId"
+            else -> "Usuário $telegramId"
         }
 }

@@ -73,7 +73,7 @@ fun MobileLoginScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
-                contentDescription = "Server Settings",
+                contentDescription = "Configurações do Servidor",
                 tint = if (uiState.showServerConfig) MobilePrimary else Color.White.copy(alpha = 0.6f)
             )
         }
@@ -113,7 +113,7 @@ fun MobileLoginScreen(
             )
             
             Text(
-                text = "Secure Media Streaming",
+                text = "Streaming de Mídia Seguro",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.5f)
             )
@@ -136,7 +136,7 @@ fun MobileLoginScreen(
                         modifier = Modifier.padding(20.dp)
                     ) {
                         Text(
-                            text = "Server Settings",
+                            text = "Configurações do Servidor",
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold
@@ -147,7 +147,7 @@ fun MobileLoginScreen(
                         OutlinedTextField(
                             value = uiState.serverUrl,
                             onValueChange = { viewModel.updateServerUrl(it) },
-                            label = { Text("Server URL", color = Color.White.copy(alpha = 0.6f)) },
+                            label = { Text("URL do Servidor", color = Color.White.copy(alpha = 0.6f)) },
                             placeholder = { Text("http://192.168.1.x:8000") },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -164,7 +164,7 @@ fun MobileLoginScreen(
                         if (uiState.botUsername.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Connected to @${uiState.botUsername}",
+                                text = "Conectado a @${uiState.botUsername}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MobilePrimary.copy(alpha = 0.8f),
                                 modifier = Modifier.padding(start = 4.dp)
@@ -181,7 +181,7 @@ fun MobileLoginScreen(
                         ) {
                             Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Save & Restart", fontWeight = FontWeight.Bold)
+                            Text("Salvar e Reiniciar", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -190,11 +190,11 @@ fun MobileLoginScreen(
             if (uiState.isLoading) {
                 CircularProgressIndicator(color = MobilePrimary)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Preparing authentication...", color = Color.White.copy(alpha = 0.7f))
+                Text("Preparando autenticação...", color = Color.White.copy(alpha = 0.7f))
             } else if (uiState.loginCode != null) {
                 // Instruction
                 Text(
-                    text = "Confirm in Telegram",
+                    text = "Confirme no Telegram",
                     style = MaterialTheme.typography.titleLarge,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -226,7 +226,7 @@ fun MobileLoginScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         
                         Text(
-                            text = "Expires in 5 minutes",
+                            text = "Expira em 5 minutos",
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White.copy(alpha = 0.4f)
                         )
@@ -246,7 +246,7 @@ fun MobileLoginScreen(
                         try {
                             context.startActivity(intent)
                         } catch (e: Exception) {
-                            android.widget.Toast.makeText(context, "Could not open Telegram", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(context, "Não foi possível abrir o Telegram", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -261,7 +261,7 @@ fun MobileLoginScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Open @${uiState.botUsername.ifBlank { "TelegramTV_Bot" }}", color = Color.White)
+                    Text("Abrir @${uiState.botUsername.ifBlank { "TelegramTV_Bot" }}", color = Color.White)
                 }
                 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -275,7 +275,7 @@ fun MobileLoginScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "Waiting for confirmation...", 
+                            text = "Aguardando confirmação...", 
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.6f)
                         )
@@ -285,7 +285,7 @@ fun MobileLoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 TextButton(onClick = { viewModel.generateLoginCode() }) {
-                    Text("Generate New Code", color = Color.White.copy(alpha = 0.4f))
+                    Text("Gerar Novo Código", color = Color.White.copy(alpha = 0.4f))
                 }
             }
 
@@ -303,7 +303,7 @@ fun MobileLoginScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Retry Connection")
+                    Text("Tentar Conexão Novamente")
                 }
             }
         }

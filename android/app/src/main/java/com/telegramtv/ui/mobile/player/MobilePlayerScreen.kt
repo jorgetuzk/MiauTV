@@ -482,7 +482,7 @@ fun MobilePlayerControls(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Voltar", tint = Color.White)
                     }
                     Text(
                         text = title,
@@ -493,7 +493,7 @@ fun MobilePlayerControls(
                         maxLines = 1
                     )
                     IconButton(onClick = onResize) {
-                        Icon(Icons.Filled.Fullscreen, "Resize", tint = Color.White)
+                        Icon(Icons.Filled.Fullscreen, "Redimensionar", tint = Color.White)
                     }
                     IconButton(onClick = onOrientation) {
                         val icon = when (orientationMode) {
@@ -501,17 +501,17 @@ fun MobilePlayerControls(
                             2 -> Icons.Filled.ScreenLockPortrait
                             else -> Icons.Filled.ScreenRotation
                         }
-                        Icon(icon, "Orientation", tint = Color.White)
+                        Icon(icon, "Orientação", tint = Color.White)
                     }
                     IconButton(onClick = onPip) {
                         Icon(
                             if (isAudioFile) Icons.Filled.Headphones else Icons.Filled.PictureInPicture,
-                            if (isAudioFile) "Background Play" else "PIP",
+                            if (isAudioFile) "Reprodução em Segundo Plano" else "PIP",
                             tint = Color.White
                         )
                     }
                     IconButton(onClick = onSettings) {
-                        Icon(Icons.Filled.Settings, "Settings", tint = Color.White)
+                        Icon(Icons.Filled.Settings, "Configurações", tint = Color.White)
                     }
                 }
             }
@@ -523,7 +523,7 @@ fun MobilePlayerControls(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onRewind, modifier = Modifier.size(56.dp)) {
-                    Icon(Icons.Filled.Replay10, "Rewind", tint = Color.White, modifier = Modifier.size(40.dp))
+                    Icon(Icons.Filled.Replay10, "Retroceder", tint = Color.White, modifier = Modifier.size(40.dp))
                 }
 
                 IconButton(
@@ -542,7 +542,7 @@ fun MobilePlayerControls(
                 }
 
                 IconButton(onClick = onForward, modifier = Modifier.size(56.dp)) {
-                    Icon(Icons.Filled.Forward10, "Forward", tint = Color.White, modifier = Modifier.size(40.dp))
+                    Icon(Icons.Filled.Forward10, "Avançar", tint = Color.White, modifier = Modifier.size(40.dp))
                 }
             }
 
@@ -609,7 +609,7 @@ fun PlayerSettingsSheet(
     onOrientationChange: (Int) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Speed", "Audio", "Subtitles", "Display")
+    val tabs = listOf("Velocidade", "Áudio", "Legendas", "Tela")
 
     Column(
         modifier = Modifier
@@ -663,7 +663,7 @@ fun PlayerSettingsSheet(
             1 -> { // Audio
                 if (uiState.audioTracks.isEmpty()) {
                     Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                        Text("No audio tracks available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Nenhuma faixa de áudio disponível", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                      LazyColumn(modifier = Modifier.height(250.dp)) {
@@ -682,7 +682,7 @@ fun PlayerSettingsSheet(
                 LazyColumn(modifier = Modifier.height(250.dp)) {
                     item {
                         SettingsItem(
-                            text = "Off",
+                            text = "Desativada",
                             isSelected = !uiState.subtitlesEnabled,
                             onClick = { onSubtitleTrackSelect(null) },
                             icon = Icons.Filled.Close
@@ -703,7 +703,7 @@ fun PlayerSettingsSheet(
                             color = MaterialTheme.colorScheme.outlineVariant
                         )
                         Text(
-                            "Subtitle Size", 
+                            "Tamanho da Legenda", 
                             style = MaterialTheme.typography.labelLarge, 
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -722,15 +722,15 @@ fun PlayerSettingsSheet(
             3 -> { // Display
                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                     Text(
-                        "Resize Mode",
+                        "Modo de Redimensionamento",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                     
                     val modes = listOf(
-                         "Fit" to androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT,
-                         "Fill" to androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL,
+                         "Ajustar" to androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT,
+                         "Preencher" to androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL,
                          "Zoom" to androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                     )
                     
@@ -771,23 +771,23 @@ fun PlayerSettingsSheet(
                             onClick = { onVideoScaleChange(1.0f) },
                             modifier = Modifier.align(Alignment.End)
                         ) {
-                            Text("Reset Zoom")
+                            Text("Redefinir Zoom")
                         }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
                     
                     Text(
-                        "Orientation",
+                        "Orientação",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                     
                     val orientationModes = listOf(
-                        "Auto" to 0,
-                        "Landscape" to 1,
-                        "Portrait" to 2
+                        "Automática" to 0,
+                        "Paisagem" to 1,
+                        "Retrato" to 2
                     )
                     
                     Row(
@@ -852,7 +852,7 @@ fun SettingsItem(
         }
         
         if (isSelected) {
-            Icon(Icons.Filled.Check, "Selected", tint = MaterialTheme.colorScheme.primary)
+            Icon(Icons.Filled.Check, "Selecionado", tint = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -927,12 +927,12 @@ fun PlayerErrorScreen(
                     onClick = onBack,
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                 ) {
-                    Text("Go Back")
+                    Text("Voltar")
                 }
                 
                 if (error.canRetry) {
                     Button(onClick = onRetry) {
-                        Text("Retry")
+                        Text("Tentar Novamente")
                     }
                 }
                 
@@ -940,7 +940,7 @@ fun PlayerErrorScreen(
                     onClick = onOpenExternal,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
-                    Text("External Player")
+                    Text("Player Externo")
                 }
             }
         }

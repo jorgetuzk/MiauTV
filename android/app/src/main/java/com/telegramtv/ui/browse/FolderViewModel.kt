@@ -71,7 +71,7 @@ class FolderViewModel @Inject constructor(
                 onFailure = { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = e.message ?: "Failed to load folder"
+                        error = e.message ?: "Falha ao carregar pasta"
                     )
                 }
             )
