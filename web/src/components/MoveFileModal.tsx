@@ -1,8 +1,8 @@
 /**
  * MoveFileModal - modal for selecting a destination folder
  */
-import { useState } from 'react';
-import { X, Folder as FolderIcon, ChevronRight, Home } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { X, Folder as FolderIcon, ChevronRight, Home, Search } from 'lucide-react';
 import { useFolderTree, TelegramFile, Folder, useMoveFiles, useMoveFolders } from '../lib/api';
 import { useAppStore } from '../lib/store';
 
@@ -11,8 +11,28 @@ interface MoveFileModalProps {
     onClose: () => void;
 }
 
+interface FlatFolder {
+    id: number;
+    name: string;
+    depth: number;
+    file_count: number;
+}
+
+function flattenTree(folders: Folder[], depth = 0): FlatFolder[] {
+    const result: FlatFolder[] = [];
+    for (const folder of folders) {
+        result.push({ id: folder.id, name: folder.name, depth, file_count: folder.file_count });
+        if (folder.children?.length) {
+            result.push(...flattenTree(folder.children, depth + 1));
+        }
+    }
+    return result;
+}
+
 export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [searchInput, setSearchInput] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const { data: folderTree, isLoading } = useFolderTree();
     const { mutateAsync: moveFiles, isPending: isFilesPending } = useMoveFiles();
     const { mutateAsync: moveFolders, isPending: isFoldersPending } = useMoveFolders();
@@ -20,6 +40,19 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
 
     const isPending = isFilesPending || isFoldersPending;
     const totalItems = items.files.length + items.folders.length;
+
+    // Debounce the search input a little so we don't re-filter on every keystroke.
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(searchInput.trim().toLowerCase()), 180);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
+
+    const flatFolders = useMemo(() => flattenTree(folderTree || []), [folderTree]);
+
+    const searchResults = useMemo(() => {
+        if (!debouncedSearch) return null;
+        return flatFolders.filter((f) => f.name.toLowerCase().includes(debouncedSearch));
+    }, [flatFolders, debouncedSearch]);
 
     const handleMove = async () => {
         try {
@@ -56,33 +89,65 @@ export default function MoveFileModal({ items, onClose }: MoveFileModalProps) {
                     </button>
                 </div>
 
-                <p className="text-sm text-dark-400 mb-4 truncate">
+                <p className="text-sm text-dark-400 mb-3 truncate">
                     Selecione a pasta de destino
                 </p>
 
-                <div className="bg-dark-800 rounded-lg max-h-64 overflow-y-auto mb-4 custom-scrollbar">
-                    {/* Root option */}
-                    <button
-                        onClick={() => setSelectedId(null)}
-                        className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-dark-700 transition-colors ${selectedId === null ? 'bg-primary-600/20 text-primary-400' : ''
-                            }`}
-                    >
-                        <Home className="w-4 h-4" />
-                        <span>Raiz (Sem pasta)</span>
-                    </button>
+                <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="Buscar pasta..."
+                        className="w-full bg-dark-800 border border-white/[0.06] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-primary-500/50 focus:bg-dark-700 transition-all"
+                    />
+                </div>
 
-                    {isLoading ? (
-                        <div className="p-4 text-center text-dark-400">Carregando...</div>
+                <div className="bg-dark-800 rounded-lg max-h-64 overflow-y-auto mb-4 custom-scrollbar">
+                    {searchResults ? (
+                        searchResults.length > 0 ? (
+                            searchResults.map((folder) => (
+                                <button
+                                    key={folder.id}
+                                    onClick={() => setSelectedId(folder.id)}
+                                    className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-dark-700 transition-colors ${selectedId === folder.id ? 'bg-primary-600/20 text-primary-400' : ''
+                                        }`}
+                                >
+                                    <FolderIcon className="w-4 h-4 text-primary-400 shrink-0" />
+                                    <span className="truncate">{folder.name}</span>
+                                    <span className="text-xs text-dark-500 ml-auto">{folder.file_count}</span>
+                                </button>
+                            ))
+                        ) : (
+                            <div className="p-4 text-center text-dark-400 text-sm">Nenhuma pasta encontrada</div>
+                        )
                     ) : (
-                        folderTree?.map((folder) => (
-                            <FolderTreeItem
-                                key={folder.id}
-                                folder={folder}
-                                selectedId={selectedId}
-                                onSelect={setSelectedId}
-                                depth={0}
-                            />
-                        ))
+                        <>
+                            {/* Root option */}
+                            <button
+                                onClick={() => setSelectedId(null)}
+                                className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-dark-700 transition-colors ${selectedId === null ? 'bg-primary-600/20 text-primary-400' : ''
+                                    }`}
+                            >
+                                <Home className="w-4 h-4" />
+                                <span>Raiz (Sem pasta)</span>
+                            </button>
+
+                            {isLoading ? (
+                                <div className="p-4 text-center text-dark-400">Carregando...</div>
+                            ) : (
+                                folderTree?.map((folder) => (
+                                    <FolderTreeItem
+                                        key={folder.id}
+                                        folder={folder}
+                                        selectedId={selectedId}
+                                        onSelect={setSelectedId}
+                                        depth={0}
+                                    />
+                                ))
+                            )}
+                        </>
                     )}
                 </div>
 
