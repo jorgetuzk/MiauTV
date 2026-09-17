@@ -91,7 +91,7 @@ fun HomeScreen(
                         if (uiState.continueWatching.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Continuar Assistindo",
+                                    title = "Voltar a Ver",
                                     subtitle = "${uiState.continueWatching.size} em andamento",
                                     icon = Icons.Default.PlayCircle
                                 ) {
@@ -110,7 +110,7 @@ fun HomeScreen(
                         if (uiState.recentFiles.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Adicionados Recentemente",
+                                    title = "Add Recente",
                                     subtitle = "Últimos envios",
                                     icon = Icons.Default.Schedule
                                 ) {

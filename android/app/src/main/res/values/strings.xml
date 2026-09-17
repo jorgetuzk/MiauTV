@@ -2,8 +2,8 @@
     <string name="app_name">MiauTV</string>
 
     <!-- Home Screen -->
-    <string name="continue_watching">Continuar Assistindo</string>
-    <string name="recently_added">Adicionados Recentemente</string>
+    <string name="continue_watching">Voltar a Ver</string>
+    <string name="recently_added">Add Recente</string>
     <string name="all_files">Todos os Arquivos</string>
     <string name="folders">Pastas</string>
     <string name="search">Buscar</string>

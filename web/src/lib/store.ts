@@ -94,7 +94,7 @@ export const useAppStore = create<AppState>((set) => ({
 
     // Navigation Section
     activeSection: 'files',
-    setActiveSection: (section) => set({ activeSection: section, currentFolderId: null, breadcrumbs: [{ id: null, name: section === 'files' ? 'Meus Arquivos' : section === 'recent' ? 'Adicionados Recentemente' : 'Continuar Assistindo' }] }),
+    setActiveSection: (section) => set({ activeSection: section, currentFolderId: null, breadcrumbs: [{ id: null, name: section === 'files' ? 'Meus Arquivos' : section === 'recent' ? 'Add Recente' : 'Voltar a Ver' }] }),
 
     // Selection
     selectedFileIds: new Set(),

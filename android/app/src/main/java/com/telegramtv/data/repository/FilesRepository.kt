@@ -164,7 +164,7 @@ class FilesRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Falha ao carregar Continuar Assistindo"))
+                Result.failure(Exception("Falha ao carregar Voltar a Ver"))
             }
         } catch (e: Exception) {
             Result.failure(e)

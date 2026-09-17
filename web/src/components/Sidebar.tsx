@@ -92,8 +92,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {/* Navigation */}
                 <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
                     <NavItem section="files" icon={Files} label="Meus Arquivos" />
-                    <NavItem section="recent" icon={Clock} label="Adicionados Recentemente" />
-                    <NavItem section="continue_watching" icon={PlayCircle} label="Continuar Assistindo" />
+                    <NavItem section="recent" icon={Clock} label="Add Recente" />
+                    <NavItem section="continue_watching" icon={PlayCircle} label="Voltar a Ver" />
                 </nav>
 
                 {/* Storage Info */}
@@ -130,7 +130,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-dark-400 hover:text-orange-400 hover:bg-orange-500/10 transition-colors mt-1"
                     >
                         <Users className="w-5 h-5" />
-                        <span className="font-medium">Sair de Todos os Dispositivos</span>
+                        <span className="font-medium">Sair de tudo</span>
                     </button>
                 </div>
             </aside>
@@ -174,7 +174,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Users className="w-6 h-6 text-orange-500" />
                             </div>
-                            <h3 className="text-xl font-semibold text-white mb-2">Sair de Todos os Dispositivos</h3>
+                            <h3 className="text-xl font-semibold text-white mb-2">Sair de tudo</h3>
                             <p className="text-dark-400 text-sm">
                                 Isso vai encerrar sua sessão em <strong>todos os dispositivos</strong>. Tem certeza?
                             </p>
@@ -191,7 +191,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 className="flex-1 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors shadow-lg shadow-orange-500/20"
                                 disabled={logoutAllMutation.isPending}
                             >
-                                {logoutAllMutation.isPending ? 'Saindo...' : 'Sair de Todos'}
+                                {logoutAllMutation.isPending ? 'Saindo...' : 'Sair de tudo'}
                             </button>
                         </div>
                     </div>

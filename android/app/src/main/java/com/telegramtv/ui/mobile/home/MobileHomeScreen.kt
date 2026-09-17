@@ -111,7 +111,7 @@ fun MobileHomeScreen(
             // 2. Continue Watching (Only on Root)
             if (uiState.currentFolderId == null && uiState.continueWatching.isNotEmpty()) {
                 item {
-                    SectionHeader("Continuar Assistindo")
+                    SectionHeader("Voltar a Ver")
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -130,7 +130,7 @@ fun MobileHomeScreen(
             // 3. Recent Files (Only on Root)
             if (uiState.currentFolderId == null && uiState.recentFiles.isNotEmpty()) {
                 item {
-                    SectionHeader("Adicionados Recentemente")
+                    SectionHeader("Add Recente")
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
