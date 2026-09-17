@@ -489,7 +489,7 @@ fun HomeHeader(
             )
             if (folderName == "Home") {
                 Text(
-                    text = "Welcome back to TelePlay",
+                    text = "Welcome back to MiauTV",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

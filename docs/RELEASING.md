@@ -1,6 +1,6 @@
-# Releasing TelePlay
+# Releasing MiauTV
 
-This document describes how to create releases for TelePlay.
+This document describes how to create releases for MiauTV.
 
 ## Android TV & Mobile APK Releases
 
@@ -46,7 +46,7 @@ For signed release APKs, configure these GitHub Secrets:
 
 ```bash
 # Generate a new keystore
-keytool -genkey -v -keystore release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias teleplay
+keytool -genkey -v -keystore release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias miautv
 
 # Encode to base64 for GitHub Secret
 base64 -w 0 release.jks > keystore-base64.txt
@@ -58,7 +58,7 @@ base64 -w 0 release.jks > keystore-base64.txt
 2. Add each secret:
    - `KEYSTORE_BASE64`: Contents of `keystore-base64.txt`
    - `KEYSTORE_PASSWORD`: Password you used when creating keystore
-   - `KEY_ALIAS`: `teleplay` (or whatever alias you used)
+   - `KEY_ALIAS`: `miautv` (or whatever alias you used)
    - `KEY_PASSWORD`: Key password (same as keystore password if you used the same)
 
 ### Without Signing

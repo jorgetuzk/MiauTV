@@ -3,7 +3,7 @@ package com.telegramtv.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.telegramtv.data.api.AuthInterceptor
-import com.telegramtv.data.api.TelePlayApi
+import com.telegramtv.data.api.MiauTVApi
 import com.telegramtv.data.repository.AuthRepository
 import com.telegramtv.data.repository.FilesRepository
 import com.telegramtv.data.repository.FoldersRepository
@@ -101,19 +101,19 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTelePlayApi(retrofit: Retrofit): TelePlayApi {
-        return retrofit.create(TelePlayApi::class.java)
+    fun provideMiauTVApi(retrofit: Retrofit): MiauTVApi {
+        return retrofit.create(MiauTVApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideFilesRepository(api: TelePlayApi): FilesRepository {
+    fun provideFilesRepository(api: MiauTVApi): FilesRepository {
         return FilesRepository(api)
     }
 
     @Provides
     @Singleton
-    fun provideFoldersRepository(api: TelePlayApi): FoldersRepository {
+    fun provideFoldersRepository(api: MiauTVApi): FoldersRepository {
         return FoldersRepository(api)
     }
 }

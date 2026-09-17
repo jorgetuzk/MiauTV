@@ -1,5 +1,5 @@
 """
-TelePlay Backend Application.
+MiauTV Backend Application.
 """
 from .main import app
 

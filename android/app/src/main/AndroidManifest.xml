@@ -35,7 +35,7 @@
         android:required="false" />
 
     <application
-        android:name=".TelePlayApp"
+        android:name=".MiauTVApp"
         android:allowBackup="true"
         android:requestLegacyExternalStorage="true"
         android:icon="@drawable/app_logo"

@@ -160,7 +160,7 @@ async def start_command(client, message: Message):
                      return
 
     await message.reply(
-        "📺 **Welcome to TelePlay!**\n\n"
+        "📺 **Welcome to MiauTV!**\n\n"
         "Your personal media streaming platform.\n"
         "Upload files here, stream anywhere!\n\n"
         
@@ -196,7 +196,7 @@ async def start_command(client, message: Message):
 async def help_command(client, message: Message):
     """Show help message."""
     await message.reply(
-        "📖 **TelePlay Help**\n\n"
+        "📖 **MiauTV Help**\n\n"
         
         "━━━━━━━━━━━━━━━━━━━━\n"
         "📤 **UPLOADING FILES**\n"

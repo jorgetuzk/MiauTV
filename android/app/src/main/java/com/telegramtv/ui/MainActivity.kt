@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.telegramtv.data.repository.AuthRepository
 import com.telegramtv.ui.navigation.NavGraph
-import com.telegramtv.ui.theme.TelePlayTheme
+import com.telegramtv.ui.theme.MiauTVTheme
 import com.telegramtv.ui.theme.TVBackground
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
- * Main Activity for TelePlay.
+ * Main Activity for MiauTV.
  * Serves as the entry point and hosts the Compose navigation.
  */
 @AndroidEntryPoint
@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            TelePlayTheme {
+            MiauTVTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = TVBackground

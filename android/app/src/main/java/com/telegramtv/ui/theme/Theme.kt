@@ -34,7 +34,7 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = DarkColorScheme
 
 @Composable
-fun TelePlayTheme(
+fun MiauTVTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
@@ -72,7 +72,7 @@ val ExpressiveShapes = Shapes(
 )
 
 @Composable
-fun TelePlayMobileTheme(
+fun MiauTVMobileTheme(
     content: @Composable () -> Unit
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current

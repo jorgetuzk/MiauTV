@@ -1,4 +1,4 @@
-# TelePlay Backend
+# MiauTV Backend
 
 # Telegram MTProto Client
 pyrotgfork>=2.2.0

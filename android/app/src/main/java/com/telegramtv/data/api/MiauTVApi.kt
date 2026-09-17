@@ -5,9 +5,9 @@ import retrofit2.Response
 import retrofit2.http.*
 
 /**
- * TelePlay API interface for Retrofit.
+ * MiauTV API interface for Retrofit.
  */
-interface TelePlayApi {
+interface MiauTVApi {
 
     // ============ Authentication ============
 

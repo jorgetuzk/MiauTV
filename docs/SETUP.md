@@ -1,12 +1,12 @@
-# 📖 TelePlay: Setup & Usage Guide
+# 📖 MiauTV: Setup & Usage Guide
 
-Welcome to **TelePlay**! This guide covers everything from the core concepts to using the bot and apps.
+Welcome to **MiauTV**! This guide covers everything from the core concepts to using the bot and apps.
 
 ---
 
 ## 🧠 How it Works
 
-TelePlay is a self-hosted media center that turns Telegram into your personal "Netflix".
+MiauTV is a self-hosted media center that turns Telegram into your personal "Netflix".
 
 1.  **Telegram Storage**: All your media files (Videos, Movies, Music) are stored in your own **Private Telegram Channel**. Telegram provides unlimited storage for files up to 2GB each.
 2.  **Database**: A small database (SQLite or PostgreSQL) keeps track of your file names, folders, and watch progress.
@@ -17,7 +17,7 @@ TelePlay is a self-hosted media center that turns Telegram into your personal "N
 
 ## 🛠 Part 1: Server Setup
 
-To get started, you must first deploy your own TelePlay server. This server will host the "brain" and the web interface.
+To get started, you must first deploy your own MiauTV server. This server will host the "brain" and the web interface.
 
 > [!TIP]
 > **Don't stay here for the technical installation!**
@@ -53,7 +53,7 @@ When you upload a file or use `/file <id>`, you get interactive buttons to:
 
 - **✏️ Rename**: Change the display name.
 - **📂 Move**: Put files into folders for better organization.
-- **🗑 Delete**: Remove from both TelePlay and your channel.
+- **🗑 Delete**: Remove from both MiauTV and your channel.
 
 ---
 

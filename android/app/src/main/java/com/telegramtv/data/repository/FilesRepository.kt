@@ -1,6 +1,6 @@
 package com.telegramtv.data.repository
 
-import com.telegramtv.data.api.TelePlayApi
+import com.telegramtv.data.api.MiauTVApi
 import com.telegramtv.data.model.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,7 +10,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class FilesRepository @Inject constructor(
-    private val api: TelePlayApi
+    private val api: MiauTVApi
 ) {
 
     /**

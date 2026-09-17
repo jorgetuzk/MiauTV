@@ -1,4 +1,4 @@
-# 🏗️ TelePlay — Architecture & Technical Overview
+# 🏗️ MiauTV — Architecture & Technical Overview
 
 A self-hosted media streaming platform that uses Telegram as its storage backend. Upload files via a Telegram Bot, organize them through a Web App, and stream them to any device — including Android TV.
 
@@ -89,7 +89,7 @@ The bot runs on Telegram's native **MTProto** protocol (via PyroTGFork), not the
 ## 📁 Project Structure
 
 ```
-teleplay/
+miautv/
 ├── backend/                     # Python Backend
 │   ├── app/
 │   │   ├── routers/             # API endpoint groups
@@ -448,7 +448,7 @@ A monolith `Dockerfile` (root) bundles the backend and web app into a single con
 | `TELEGRAM_BOT_TOKEN`          | ✅       | From @BotFather.                                     |
 | `TELEGRAM_STORAGE_CHANNEL_ID` | ✅       | Private channel ID (starts with `-100`).             |
 | `JWT_SECRET`                  | ✅       | Long random string for signing tokens.               |
-| `DATABASE_URL`                | ✅       | `postgresql://...` or `sqlite:///./data/teleplay.db` |
+| `DATABASE_URL`                | ✅       | `postgresql://...` or `sqlite:///./data/miautv.db` |
 | `WEB_BASE_URL`                | ❌       | Public URL of the web app.                           |
 | `TELEGRAM_HELPER_BOT_TOKENS`  | ❌       | Comma-separated tokens for parallel downloads.       |
 | `AUTH_USERS`                  | ❌       | Comma-separated Telegram IDs for access control.     |

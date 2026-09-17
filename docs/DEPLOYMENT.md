@@ -1,4 +1,4 @@
-# 🚀 TelePlay: Complete Deployment Guide
+# 🚀 MiauTV: Complete Deployment Guide
 
 This guide is designed for everyone, even if you've never used Docker or deployed a website before. Follow these steps carefully to get your media streaming server up and running.
 
@@ -26,7 +26,7 @@ You need three things from Telegram to make this work:
 
 1. Log in to [my.telegram.org](https://my.telegram.org) using your phone number.
 2. Click on **"API development tools"**.
-3. Create a new "App" (you can name it "TelePlay").
+3. Create a new "App" (you can name it "MiauTV").
 4. Once created, you will see `App api_id` and `App api_hash`. **Copy these and keep them safe.**
 
 ### 1.2 Bot Token
@@ -38,7 +38,7 @@ You need three things from Telegram to make this work:
 
 ### 1.3 Helper Bots (Optional - For faster speeds)
 
-To increase download speeds, you can create multiple bots (e.g., "TelePlay Helper 1", "TelePlay Helper 2").
+To increase download speeds, you can create multiple bots (e.g., "MiauTV Helper 1", "MiauTV Helper 2").
 
 1. Get the tokens for each from @BotFather.
 2. **Crucial**: Add every helper bot as an **Administrator** to your Storage Channel.
@@ -123,14 +123,14 @@ _Best if you already have a VPS with CapRover installed. It provides a "One-Clic
 
 1. **Dashboard Setup**:
    - Log in to your CapRover dashboard.
-   - Click **"Apps"** and create a new app (e.g., `teleplay`).
+   - Click **"Apps"** and create a new app (e.g., `miautv`).
    - Click on the app name to open its settings.
 
 2. **Persistent Storage (Crucial)**:
    - Go to **"App Configs"**.
    - Under **"Persistent Directories"**, click **"Add persistent directory"**.
    - Path in App: `/app/session`
-   - Label: `teleplay-session`
+   - Label: `miautv-session`
    - This ensures your session data is not lost when the app restarts.
 
 3. **Environment Variables**:
@@ -158,7 +158,7 @@ _Best if you already have a VPS with CapRover installed. It provides a "One-Clic
 _For users who want full control over their own server._
 
 1. SSH into your VPS.
-2. Clone the repo: `git clone <repo_url> teleplay && cd teleplay`
+2. Clone the repo: `git clone <repo_url> miautv && cd miautv`
 3. Setup environment:
    ```bash
    cd backend
@@ -180,7 +180,7 @@ _For users who want full control over their own server._
 2. **Android TV**:
    - Download the APK from the GitHub releases.
    - Install it on your TV (you may need to enable "Unknown Sources").
-   - Enter your server URL (e.g., `https://myteleplay.up.railway.app`).
+   - Enter your server URL (e.g., `https://mymiautv.up.railway.app`).
 
 ---
 
@@ -192,9 +192,9 @@ Your **Server URL** is the address where your app is running. You need this to l
 | :---------------- | :------------------------------------------------------------ | :----------------------------------- |
 | **Local Machine** | Open terminal and type `ipconfig`. Look for **IPv4 Address**. | `http://192.168.1.100`               |
 | **VPS / Docker**  | Use the **Public IP** of your VPS provider's dashboard.       | `http://159.65.123.45`               |
-| **Railway**       | Go to **Settings** -> **Public Networking** -> **Domains**.   | `https://teleplay.up.railway.app`    |
-| **Render**        | Go to your **Web Service Dashboard**, URL is at the top.      | `https://teleplay.onrender.com`      |
-| **CapRover**      | Go to **Apps** -> **[Your App]** -> **URL**.                  | `https://teleplay.apps.mydomain.com` |
+| **Railway**       | Go to **Settings** -> **Public Networking** -> **Domains**.   | `https://miautv.up.railway.app`    |
+| **Render**        | Go to your **Web Service Dashboard**, URL is at the top.      | `https://miautv.onrender.com`      |
+| **CapRover**      | Go to **Apps** -> **[Your App]** -> **URL**.                  | `https://miautv.apps.mydomain.com` |
 
 > [!IMPORTANT]
 >
@@ -214,7 +214,7 @@ These are the "keys" that make the application work. You must add these regardle
 | `TELEGRAM_STORAGE_CHANNEL_ID` | From your private channel (See Step 1.4). Starts with `-100`.                                          |
 | `JWT_SECRET`                  | A long, random string (e.g., `s0me_v3ry_l0ng_p4ssw0rd_123`). You can make this up, but keep it secret! |
 | `DATABASE_URL`                | The path to your database. See the [Database Setup Guide](#database-setup-guide) below.                |
-| `WEB_BASE_URL`                | The public URL where you visit the app (e.g., `https://teleplay.your-vps.com`).                        |
+| `WEB_BASE_URL`                | The public URL where you visit the app (e.g., `https://miautv.your-vps.com`).                        |
 | `TELEGRAM_HELPER_BOT_TOKENS`  | (Optional) Comma-separated tokens for extra bots to speed up downloads.                                |
 | `AUTH_USERS`                  | (Optional) Comma-separated Telegram User IDs allowed to use the bot. Leave empty for everyone.         |
 
@@ -222,13 +222,13 @@ These are the "keys" that make the application work. You must add these regardle
 
 ## 🗄 Database Setup Guide
 
-TelePlay supports two types of databases: **PostgreSQL** (Professional/Stable) and **SQLite** (Simple/Local).
+MiauTV supports two types of databases: **PostgreSQL** (Professional/Stable) and **SQLite** (Simple/Local).
 
 ### 1. SQLite
 
 SQLite is a simple file-based database. No extra server needed.
 
-- **URL Format**: `sqlite:///./data/teleplay.db`
+- **URL Format**: `sqlite:///./data/miautv.db`
 - **Best for**: Running on your own computer (Local Machine) or a small VPS with few users.
 - **Note**: Not recommended for Railway/Render without persistent storage for the file.
 

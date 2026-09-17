@@ -1,10 +1,10 @@
-# 📺 TelePlay
+# 📺 MiauTV
 
 **Your personal, self-hosted media server — powered by Telegram.**
 
-![TelePlay Banner](files/app_banner.png)
+![MiauTV Banner](files/app_banner.png)
 
-Stream and manage your Telegram files on any device — TV, Mobile, or Browser — **without downloading the entire file**. TelePlay uses Telegram as unlimited cloud storage and streams content on-demand at high speed using its **multi-client parallel download** technology. Upload via a Telegram Bot, organize through a Web App, and watch anywhere.
+Stream and manage your Telegram files on any device — TV, Mobile, or Browser — **without downloading the entire file**. MiauTV uses Telegram as unlimited cloud storage and streams content on-demand at high speed using its **multi-client parallel download** technology. Upload via a Telegram Bot, organize through a Web App, and watch anywhere.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.11+-green.svg)
@@ -73,7 +73,7 @@ Stream and manage your Telegram files on any device — TV, Mobile, or Browser �
    │                                                  │
 ```
 
-Your files are **never stored on your server** — TelePlay streams them directly from Telegram's cloud on demand.
+Your files are **never stored on your server** — MiauTV streams them directly from Telegram's cloud on demand.
 
 ---
 
@@ -119,8 +119,8 @@ Your files are **never stored on your server** — TelePlay streams them directl
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/yourusername/teleplay.git
-cd teleplay
+git clone https://github.com/yourusername/miautv.git
+cd miautv
 cp .env.example .env
 ```
 
@@ -134,8 +134,8 @@ TELEGRAM_STORAGE_CHANNEL_ID=-100xxxxxxxxxx
 JWT_SECRET=your-super-secret-key-at-least-32-characters
 
 # Use PostgreSQL (recommended) or SQLite (no setup needed):
-DATABASE_URL=sqlite:///./data/teleplay.db
-# DATABASE_URL=postgresql://postgres:password@db:5432/teleplay
+DATABASE_URL=sqlite:///./data/miautv.db
+# DATABASE_URL=postgresql://postgres:password@db:5432/miautv
 ```
 
 ### 2. Deploy
@@ -199,8 +199,8 @@ That's it! Your services are now running:
 
 > **💡 DATABASE_URL Options:**
 >
-> - **PostgreSQL (recommended):** `postgresql://postgres:password@localhost:5432/teleplay`
-> - **SQLite (no setup needed):** `sqlite:///./data/teleplay.db`
+> - **PostgreSQL (recommended):** `postgresql://postgres:password@localhost:5432/miautv`
+> - **SQLite (no setup needed):** `sqlite:///./data/miautv.db`
 >
 > Use SQLite if you don't want to set up PostgreSQL — it works out of the box for small deployments.
 
@@ -223,7 +223,7 @@ That's it! Your services are now running:
 ## 📁 Project Structure — [Full Breakdown](docs/ARCHITECTURE.md#-project-structure)
 
 ```
-teleplay/
+miautv/
 ├── backend/                  # Python backend (FastAPI + Bot)
 │   ├── app/
 │   │   ├── routers/          # API endpoints (auth, files, folders, streaming, tv)

@@ -217,7 +217,7 @@ private fun ModernTopBar(
                 
                 Column {
                     Text(
-                        text = "TelePlay",
+                        text = "MiauTV",
                         style = MaterialTheme.typography.titleLarge,
                         color = TVTextPrimary,
                         fontWeight = FontWeight.Bold,

@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.telegramtv.data.api.TelePlayApi
+import com.telegramtv.data.api.MiauTVApi
 import com.telegramtv.data.model.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +23,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 @Singleton
 class AuthRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val api: TelePlayApi
+    private val api: MiauTVApi
 ) {
     private object PreferencesKeys {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")

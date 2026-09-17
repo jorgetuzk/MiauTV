@@ -1,6 +1,6 @@
-# Contributing to TelePlay
+# Contributing to MiauTV
 
-First off, thank you for considering contributing to TelePlay! 🎉
+First off, thank you for considering contributing to MiauTV! 🎉
 
 ## How Can I Contribute?
 

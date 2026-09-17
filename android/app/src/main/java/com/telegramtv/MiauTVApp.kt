@@ -10,11 +10,11 @@ import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 /**
- * Main Application class for TelePlay.
+ * Main Application class for MiauTV.
  * Initializes Hilt and configures Coil image loader.
  */
 @HiltAndroidApp
-class TelePlayApp : Application(), ImageLoaderFactory {
+class MiauTVApp : Application(), ImageLoaderFactory {
 
     @Inject
     lateinit var okHttpClient: OkHttpClient

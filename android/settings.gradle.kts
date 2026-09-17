@@ -15,5 +15,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TelePlay"
+rootProject.name = "MiauTV"
 include(":app")

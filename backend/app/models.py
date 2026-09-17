@@ -1,5 +1,5 @@
 """
-Database models for TelePlay streaming app.
+Database models for MiauTV streaming app.
 """
 from datetime import datetime
 from typing import Optional, List
