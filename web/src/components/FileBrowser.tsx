@@ -291,6 +291,17 @@ export default function FileBrowser() {
             (e.target as HTMLElement).closest('button') ||
             (e.target as HTMLElement).closest('.sidebar')) return;
 
+        // Ignore clicks on the scrollbar itself. The scrollbar isn't a DOM
+        // element, so a mousedown on it still targets the scrollable
+        // container — without this guard, dragging the scrollbar to scroll
+        // was wiping out the current selection.
+        const el = containerRef.current;
+        if (el && e.target === el) {
+            const clickedScrollbarY = e.nativeEvent.offsetX > el.clientWidth;
+            const clickedScrollbarX = e.nativeEvent.offsetY > el.clientHeight;
+            if (clickedScrollbarY || clickedScrollbarX) return;
+        }
+
         setIsSelecting(true);
         // Determine relative position in the container
         const rect = containerRef.current?.getBoundingClientRect();
