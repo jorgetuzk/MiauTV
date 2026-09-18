@@ -18,6 +18,14 @@ class User(Base):
     first_name: Mapped[Optional[str]] = mapped_column(String(255))
     last_name: Mapped[Optional[str]] = mapped_column(String(255))
     auth_version: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    # Active upload destination selected via /folder in the bot. New uploads
+    # go here instead of the root until the user changes or clears it.
+    # use_alter=True: users <-> folders is a circular FK relationship
+    # (folders.user_id also points back at users.id), so this one must be
+    # added as a deferred ALTER TABLE on fresh installs.
+    active_folder_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("folders.id", ondelete="SET NULL", use_alter=True, name="fk_users_active_folder_id")
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     last_active: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

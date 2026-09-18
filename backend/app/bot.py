@@ -178,6 +178,7 @@ async def start_command(client, message: Message):
         "/file `<id>` - Manage a file\n"
         "/folders - Browse folders\n"
         "/newfolder `<name>` - New folder\n"
+        "/folder - Set active upload folder\n"
         "/help - Full help guide\n\n"
         
         "💡 After uploading, you'll get the **File ID**\n"
@@ -223,7 +224,9 @@ async def help_command(client, message: Message):
         "**Folder Management:**\n"
         "• /folders - Browse all folders\n"
         "• /newfolder `<name>` - Create a folder\n"
-        "• /deletefolder `<name>` - Delete a folder\n\n"
+        "• /deletefolder `<name>` - Delete a folder\n"
+        "• /folder - Choose the active folder new uploads go into\n"
+        "• /folder raiz - Reset uploads back to the root\n\n"
         
         "━━━━━━━━━━━━━━━━━━━━\n"
         "🎛 **INTERACTIVE ACTIONS**\n"
@@ -375,8 +378,124 @@ async def newfolder_command(client, message: Message):
         folder = Folder(user_id=user.id, name=folder_name)
         db.add(folder)
         await db.commit()
-    
+
     await message.reply(f"✅ Folder **{folder_name}** created!")
+
+
+# ============== Active Upload Folder (/folder) ==============
+
+FOLDER_NAV_PAGE_SIZE = 8
+FOLDER_ROOT_TOKEN = "-1"  # sentinel for "root" in callback_data (real folder ids are positive)
+
+
+async def get_folder_breadcrumb(db, user_id: int, folder_id) -> str:
+    """Build a '/Parent/Child' path for a folder, or 'Raiz' for the root."""
+    if folder_id is None:
+        return "Raiz"
+
+    parts = []
+    current_id = folder_id
+    for _ in range(50):  # guard against any accidental cycle in bad data
+        if current_id is None:
+            break
+        result = await db.execute(select(Folder).where(Folder.id == current_id, Folder.user_id == user_id))
+        folder = result.scalar_one_or_none()
+        if not folder:
+            break
+        parts.append(folder.name)
+        current_id = folder.parent_id
+
+    return "/" + "/".join(reversed(parts)) if parts else "Raiz"
+
+
+async def build_folder_nav(user_id: int, folder_id, page: int = 0):
+    """Render the text + inline keyboard for browsing folders at one level."""
+    async with async_session() as db:
+        breadcrumb = await get_folder_breadcrumb(db, user_id, folder_id)
+
+        parent_filter = Folder.parent_id.is_(None) if folder_id is None else Folder.parent_id == folder_id
+
+        count_result = await db.execute(
+            select(func.count()).select_from(Folder).where(Folder.user_id == user_id, parent_filter)
+        )
+        total = count_result.scalar() or 0
+
+        offset = page * FOLDER_NAV_PAGE_SIZE
+        result = await db.execute(
+            select(Folder)
+            .where(Folder.user_id == user_id, parent_filter)
+            .order_by(Folder.name)
+            .offset(offset)
+            .limit(FOLDER_NAV_PAGE_SIZE)
+        )
+        subfolders = result.scalars().all()
+
+        parent_id = None
+        if folder_id is not None:
+            current = await db.execute(select(Folder).where(Folder.id == folder_id, Folder.user_id == user_id))
+            current_folder = current.scalar_one_or_none()
+            parent_id = current_folder.parent_id if current_folder else None
+
+    fid_token = str(folder_id) if folder_id is not None else FOLDER_ROOT_TOKEN
+
+    buttons = []
+    for f in subfolders:
+        buttons.append([InlineKeyboardButton(f"📂 {f.name}", callback_data=f"fnav:{f.id}:0")])
+
+    nav_row = []
+    if page > 0:
+        nav_row.append(InlineKeyboardButton("◀️ Anterior", callback_data=f"fnav:{fid_token}:{page - 1}"))
+    if offset + len(subfolders) < total:
+        nav_row.append(InlineKeyboardButton("Próxima ▶️", callback_data=f"fnav:{fid_token}:{page + 1}"))
+    if nav_row:
+        buttons.append(nav_row)
+
+    action_row = []
+    if folder_id is not None:
+        parent_token = str(parent_id) if parent_id is not None else FOLDER_ROOT_TOKEN
+        action_row.append(InlineKeyboardButton("⬅️ Voltar", callback_data=f"fnav:{parent_token}:0"))
+    action_row.append(InlineKeyboardButton("📍 Usar esta pasta", callback_data=f"fuse:{fid_token}"))
+    buttons.append(action_row)
+
+    total_pages = max(1, (total + FOLDER_NAV_PAGE_SIZE - 1) // FOLDER_NAV_PAGE_SIZE)
+    page_info = f" (página {page + 1}/{total_pages})" if total_pages > 1 else ""
+
+    text = (
+        f"📂 **{breadcrumb}**{page_info}\n\n"
+        "Escolha uma subpasta pra continuar navegando, ou toque em "
+        "**Usar esta pasta** pra tornar o nível atual o destino dos "
+        "próximos uploads."
+    )
+
+    return text, InlineKeyboardMarkup(buttons)
+
+
+@tg_client.on_message(filters.command("folder") & filters.private)
+async def folder_command(client, message: Message):
+    """Browse folders to pick where future uploads should be saved."""
+    user = await get_or_create_user(
+        message.from_user.id,
+        message.from_user.username,
+        message.from_user.first_name,
+        message.from_user.last_name,
+    )
+
+    # Shortcut: /folder raiz clears the active folder immediately.
+    if len(message.command) > 1 and message.command[1].strip().lower() in ("raiz", "root"):
+        async with async_session() as db:
+            result = await db.execute(select(User).where(User.id == user.id))
+            u = result.scalar_one()
+            u.active_folder_id = None
+            await db.commit()
+        await message.reply(
+            "📍 **Pasta ativa definida!**\n\n"
+            "📁 Pasta ativa: Raiz\n\n"
+            "Os próximos uploads serão salvos na raiz."
+        )
+        return
+
+    text, markup = await build_folder_nav(user.id, None, 0)
+    await message.reply(text, reply_markup=markup)
 
 
 @tg_client.on_message(filters.command("web") & filters.private)
@@ -561,17 +680,20 @@ async def handle_file(client, message: Message):
             "thumbnail_file_id": thumbnail_file_id,
         }
         
-        # Save to database
+        # Save to database — goes into the active upload folder (set via
+        # /folder), if any, instead of always landing in the root.
         async with async_session() as db:
             file = File(
                 user_id=user.id,
                 channel_message_id=forwarded.id,
                 file_type=file_type,
+                folder_id=user.active_folder_id,
                 **file_info
             )
             db.add(file)
             await db.commit()
             await db.refresh(file)
+            destination_breadcrumb = await get_folder_breadcrumb(db, user.id, user.active_folder_id)
         
         # Build response
         emoji = {"video": "🎬", "audio": "🎵", "document": "📄", "image": "🖼"}.get(file_type, "📎")
@@ -591,7 +713,7 @@ async def handle_file(client, message: Message):
         if file_info['width'] and file_info['height']:
             response += f"📐 Resolution: {file_info['width']}x{file_info['height']}\n"
 
-        response += f"\n📁 Folder: / (root)\n\n"
+        response += f"\n📁 Salvo em: {destination_breadcrumb}\n\n"
         response += f"💡 Use `/file {file.id}` to manage this file"
         
         await status_msg.edit(
@@ -829,9 +951,50 @@ async def handle_callback(client, callback: CallbackQuery):
             buttons.append([InlineKeyboardButton("➕ Create Folder", callback_data="create_folder")])
             
             await callback.message.edit("📁 **Your Folders:**", reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         await callback.answer()
-        
+
+    elif data.startswith("fnav:"):
+        _, fid_token, page_str = data.split(":")
+        folder_id = None if fid_token == FOLDER_ROOT_TOKEN else int(fid_token)
+        page = int(page_str)
+
+        async with async_session() as db:
+            user_result = await db.execute(select(User).where(User.telegram_id == callback.from_user.id))
+            user = user_result.scalar_one_or_none()
+
+        if not user:
+            await callback.answer("Use /start primeiro", show_alert=True)
+            return
+
+        text, markup = await build_folder_nav(user.id, folder_id, page)
+        await callback.message.edit(text, reply_markup=markup)
+        await callback.answer()
+
+    elif data.startswith("fuse:"):
+        fid_token = data.split(":")[1]
+        folder_id = None if fid_token == FOLDER_ROOT_TOKEN else int(fid_token)
+
+        async with async_session() as db:
+            user_result = await db.execute(select(User).where(User.telegram_id == callback.from_user.id))
+            user = user_result.scalar_one_or_none()
+
+            if not user:
+                await callback.answer("Use /start primeiro", show_alert=True)
+                return
+
+            user.active_folder_id = folder_id
+            await db.commit()
+            breadcrumb = await get_folder_breadcrumb(db, user.id, folder_id)
+
+        await callback.message.edit(
+            "📍 **Pasta ativa definida!**\n\n"
+            f"📁 Pasta ativa: {breadcrumb}\n\n"
+            "Os próximos uploads serão salvos aqui automaticamente.\n\n"
+            "Use /folder pra trocar, ou /folder raiz pra voltar ao padrão."
+        )
+        await callback.answer("Pasta ativa atualizada!")
+
     elif data.startswith("move:"):
         file_id = int(data.split(":")[1])
         
