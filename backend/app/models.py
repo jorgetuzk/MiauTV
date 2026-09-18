@@ -30,7 +30,12 @@ class User(Base):
     last_active: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    folders: Mapped[List["Folder"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    # foreign_keys pinned explicitly: users <-> folders now has two FK paths
+    # (folders.user_id, and this table's own active_folder_id), so SQLAlchemy
+    # can no longer infer which one this relationship should join on.
+    folders: Mapped[List["Folder"]] = relationship(
+        back_populates="user", foreign_keys="Folder.user_id", cascade="all, delete-orphan"
+    )
     files: Mapped[List["File"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     watch_progress: Mapped[List["WatchProgress"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
@@ -47,7 +52,7 @@ class Folder(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    user: Mapped["User"] = relationship(back_populates="folders")
+    user: Mapped["User"] = relationship(back_populates="folders", foreign_keys=[user_id])
     parent: Mapped[Optional["Folder"]] = relationship(back_populates="children", remote_side=[id])
     children: Mapped[List["Folder"]] = relationship(back_populates="parent", cascade="all, delete-orphan")
     files: Mapped[List["File"]] = relationship(back_populates="folder")
