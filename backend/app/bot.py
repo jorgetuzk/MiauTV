@@ -450,19 +450,21 @@ async def build_folder_nav(user_id: int, folder_id, page: int = 0):
     if nav_row:
         buttons.append(nav_row)
 
-    action_row = []
+    top_action_row = []
     if folder_id is not None:
         parent_token = str(parent_id) if parent_id is not None else FOLDER_ROOT_TOKEN
-        action_row.append(InlineKeyboardButton("⬅️ Voltar", callback_data=f"fnav:{parent_token}:0"))
-    action_row.append(InlineKeyboardButton("📍 Usar esta pasta", callback_data=f"fuse:{fid_token}"))
-    buttons.append(action_row)
+        top_action_row.append(InlineKeyboardButton("⬅️ Voltar", callback_data=f"fnav:{parent_token}:0"))
+    top_action_row.append(InlineKeyboardButton("➕ Criar Pasta", callback_data=f"fcreate:{fid_token}"))
+    buttons.append(top_action_row)
+    buttons.append([InlineKeyboardButton("📍 Usar esta pasta", callback_data=f"fuse:{fid_token}")])
 
     total_pages = max(1, (total + FOLDER_NAV_PAGE_SIZE - 1) // FOLDER_NAV_PAGE_SIZE)
     page_info = f" (página {page + 1}/{total_pages})" if total_pages > 1 else ""
 
     text = (
         f"📂 **{breadcrumb}**{page_info}\n\n"
-        "Escolha uma subpasta pra continuar navegando, ou toque em "
+        "Escolha uma subpasta pra continuar navegando, toque em "
+        "**Criar Pasta** pra adicionar uma nova aqui, ou em "
         "**Usar esta pasta** pra tornar o nível atual o destino dos "
         "próximos uploads."
     )
@@ -994,6 +996,69 @@ async def handle_callback(client, callback: CallbackQuery):
             "Use /folder pra trocar, ou /folder raiz pra voltar ao padrão."
         )
         await callback.answer("Pasta ativa atualizada!")
+
+    elif data.startswith("fcreate:"):
+        fid_token = data.split(":")[1]
+        folder_id = None if fid_token == FOLDER_ROOT_TOKEN else int(fid_token)
+        nav_message = callback.message
+
+        await callback.message.reply(
+            "➕ **Criar Pasta**\n\n"
+            "Me envie o nome da nova pasta:\n"
+            "__(ou envie /cancel pra desistir)__"
+        )
+        await callback.answer()
+
+        try:
+            reply = await client.wait_for_message(chat_id=callback.message.chat.id, timeout=60)
+
+            if reply.text and reply.text.startswith("/cancel"):
+                await reply.reply("❌ Criação de pasta cancelada.")
+                return
+
+            folder_name = reply.text.strip() if reply.text else None
+            if not folder_name:
+                await reply.reply("❌ Nome de pasta inválido.")
+                return
+
+            async with async_session() as db:
+                user_result = await db.execute(select(User).where(User.telegram_id == callback.from_user.id))
+                user = user_result.scalar_one_or_none()
+
+                if not user:
+                    await reply.reply("Use /start primeiro.")
+                    return
+
+                parent_filter = Folder.parent_id.is_(None) if folder_id is None else Folder.parent_id == folder_id
+                existing = await db.execute(
+                    select(Folder).where(
+                        Folder.user_id == user.id,
+                        Folder.name == folder_name,
+                        parent_filter,
+                    )
+                )
+                if existing.scalar_one_or_none():
+                    await reply.reply(f"❌ Já existe uma pasta **{folder_name}** aqui.")
+                    return
+
+                folder = Folder(user_id=user.id, name=folder_name, parent_id=folder_id)
+                db.add(folder)
+                await db.commit()
+
+                breadcrumb = await get_folder_breadcrumb(db, user.id, folder_id)
+
+            await reply.reply(f"✅ Pasta **{folder_name}** criada em {breadcrumb}!")
+
+            # Refresh the original navigation message so the new folder shows up
+            # right away, without the user needing to re-run /folder.
+            text, markup = await build_folder_nav(user.id, folder_id, 0)
+            await nav_message.edit(text, reply_markup=markup)
+
+        except Exception as e:
+            if "timeout" in str(e).lower():
+                await callback.message.reply("⏱ Tempo esgotado. Tente de novo.")
+            else:
+                await callback.message.reply(f"❌ Erro: {str(e)}")
 
     elif data.startswith("move:"):
         file_id = int(data.split(":")[1])
