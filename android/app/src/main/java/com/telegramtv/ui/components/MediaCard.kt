@@ -227,7 +227,10 @@ private fun FileTypeBadge(
 }
 
 /**
- * Large media card variant for featured content.
+ * Large media card variant for featured content ("Voltar a Ver") — a
+ * vertical poster card (2:3 cover, title below, genre chip) matching the
+ * web app's Mídia card layout (MediaFolderCard/MediaFileCard.tsx), instead
+ * of the landscape overlay-text style the small MediaCard above uses.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -250,14 +253,13 @@ fun LargeMediaCard(
     Card(
         onClick = onClick,
         modifier = modifier
-            .width(320.dp)
-            .height(220.dp)
+            .width(200.dp)
             .scale(scale)
             .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) Modifier.shadow(
                     elevation = 16.dp,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(20.dp),
                     ambientColor = TVAccentGlow,
                     spotColor = TVPrimary.copy(alpha = 0.3f)
                 ) else Modifier
@@ -265,91 +267,92 @@ fun LargeMediaCard(
         colors = CardDefaults.colors(
             containerColor = if (isFocused) TVCardFocused else TVCardBackground
         ),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
+        shape = CardDefaults.shape(shape = RoundedCornerShape(20.dp))
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(
-                model = thumbnailUrl,
-                contentDescription = file.fileName,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
-            // Gradient overlay
+        Column(modifier = Modifier.padding(12.dp)) {
+            // Poster (2:3, like a TMDB cover)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(110.dp)
-                    .align(Alignment.BottomCenter)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.92f)
-                            )
-                        )
-                    )
-            )
-
-            // File type badge
-            FileTypeBadge(
-                fileName = file.fileName,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(10.dp)
-            )
-
-            // File info
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
+                    .aspectRatio(2f / 3f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(TVSurfaceVariant)
             ) {
-                Text(
-                    text = file.fileName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = TVTextPrimary,
-                    fontWeight = if (isFocused) FontWeight.Bold else FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                AsyncImage(
+                    model = thumbnailUrl,
+                    contentDescription = file.displayTitle,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                FileTypeBadge(
+                    fileName = file.fileName,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Text(
-                        text = file.formattedSize,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TVTextSecondary
+                if (file.progressPercent > 0f) {
+                    LinearProgressIndicator(
+                        progress = { file.progressPercent / 100f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp)
+                            .align(Alignment.BottomCenter),
+                        color = TVPrimary,
+                        trackColor = TVProgressBackground
                     )
-                    file.formattedDuration?.let { duration ->
-                        Text(
-                            text = duration,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TVTextSecondary
-                        )
-                    }
-                    file.resolution?.let { res ->
-                        Text(
-                            text = res,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TVPrimaryLight
-                        )
-                    }
                 }
             }
 
-            // Progress bar
-            if (file.progressPercent > 0f) {
-                LinearProgressIndicator(
-                    progress = { file.progressPercent / 100f },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp)
-                        .align(Alignment.BottomCenter),
-                    color = TVPrimary,
-                    trackColor = TVProgressBackground
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = file.displayTitle,
+                style = MaterialTheme.typography.titleSmall,
+                color = TVTextPrimary,
+                fontWeight = if (isFocused) FontWeight.Bold else FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Divider, same visual break as the web card's title/meta split
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(TVSurfaceVariant)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val genre = file.primaryGenre
+            if (genre != null) {
+                Text(
+                    text = genre,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TVPrimaryLight,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    file.formattedDuration?.let { duration ->
+                        Text(
+                            text = duration,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TVTextSecondary
+                        )
+                    }
+                    Text(
+                        text = file.formattedSize,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TVTextSecondary
+                    )
+                }
             }
         }
     }

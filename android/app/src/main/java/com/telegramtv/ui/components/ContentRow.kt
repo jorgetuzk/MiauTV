@@ -40,7 +40,11 @@ fun ContentRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(files, key = { it.id }) { file ->
-                val thumbnailUrl = "$serverUrl/api/stream/${file.id}/thumbnail"
+                // Prefer the API's own resolved thumbnail_url (covers a
+                // custom/TMDb cover when set, cache-busted) — falls back to
+                // the plain stream endpoint for older responses without it.
+                val thumbnailUrl = file.thumbnailUrl?.let { "$serverUrl$it" }
+                    ?: "$serverUrl/api/stream/${file.id}/thumbnail"
                 
                 if (useLargeCards) {
                     LargeMediaCard(

@@ -28,8 +28,23 @@ data class FileItem(
     @SerializedName("updated_at") val updatedAt: String,
     // Watch progress (optional, returned in TV browse responses)
     @SerializedName("progress") val watchProgress: Int? = null,
-    @SerializedName("progress_updated") val progressUpdated: String? = null
+    @SerializedName("progress_updated") val progressUpdated: String? = null,
+    // Display metadata (already returned by the API, previously unused here)
+    // — lets TV cards show a proper title/genre the same way the web app's
+    // Mídia cards do, instead of just the raw filename.
+    @SerializedName("title") val title: String? = null,
+    @SerializedName("genres") val genres: List<String> = emptyList(),
+    // Relative path (e.g. "/api/stream/123/thumbnail?v=...") — prepend the
+    // server URL to use it. Falls back to the plain stream endpoint when
+    // absent (e.g. a file with no cover yet).
+    @SerializedName("thumbnail_url") val thumbnailUrl: String? = null
 ) {
+    /** Title if set, else the filename with its extension stripped. */
+    val displayTitle: String
+        get() = title?.takeIf { it.isNotBlank() } ?: fileName.substringBeforeLast('.')
+
+    val primaryGenre: String?
+        get() = genres.firstOrNull()
     /**
      * Human-readable file size (e.g., "1.5 GB").
      */
