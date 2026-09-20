@@ -87,6 +87,15 @@ fun HomeScreen(
                         contentPadding = PaddingValues(bottom = 48.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // Placeholder menu rows, reserved for future custom
+                        // menus — shown above Continue a Ver.
+                        item {
+                            PlaceholderMenuRow(title = "Menu 1")
+                        }
+                        item {
+                            PlaceholderMenuRow(title = "Menu 2")
+                        }
+
                         // Continue Watching section
                         if (uiState.continueWatching.isNotEmpty()) {
                             item {
@@ -106,35 +115,37 @@ fun HomeScreen(
                             }
                         }
 
-                        // Recently Added section
-                        if (uiState.recentFiles.isNotEmpty()) {
+                        // Destaques section — Mídia title folders, same
+                        // pooling logic as the web app's Mídia landing page.
+                        if (uiState.featuredFolders.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Add Recente",
-                                    subtitle = "Últimos envios",
-                                    icon = Icons.Default.Schedule
+                                    title = "Destaques",
+                                    subtitle = "Em destaque na Mídia",
+                                    icon = Icons.Default.Star
                                 ) {
-                                    ContentRow(
+                                    FolderPosterRow(
                                         title = "",
-                                        files = uiState.recentFiles,
+                                        items = uiState.featuredFolders,
                                         serverUrl = uiState.serverUrl,
-                                        onFileClick = onFileClick
+                                        onFolderClick = onFolderClick
                                     )
                                 }
                             }
                         }
 
-                        // Folders section
-                        if (uiState.folders.isNotEmpty()) {
+                        // Recentes section — Mídia title folders (not files).
+                        if (uiState.recentFolders.isNotEmpty()) {
                             item {
                                 ContentSection(
-                                    title = "Sua Biblioteca",
-                                    subtitle = "${uiState.folders.size} pastas",
-                                    icon = Icons.Default.Folder
+                                    title = "Recentes",
+                                    subtitle = "Últimos adicionados",
+                                    icon = Icons.Default.Schedule
                                 ) {
-                                    FolderRow(
+                                    FolderPosterRow(
                                         title = "",
-                                        folders = uiState.folders,
+                                        items = uiState.recentFolders,
+                                        serverUrl = uiState.serverUrl,
                                         onFolderClick = onFolderClick
                                     )
                                 }
@@ -142,9 +153,9 @@ fun HomeScreen(
                         }
 
                         // Empty state
-                        if (uiState.continueWatching.isEmpty() && 
-                            uiState.recentFiles.isEmpty() && 
-                            uiState.folders.isEmpty()) {
+                        if (uiState.continueWatching.isEmpty() &&
+                            uiState.featuredFolders.isEmpty() &&
+                            uiState.recentFolders.isEmpty()) {
                             item {
                                 ModernEmptyState()
                             }
@@ -358,6 +369,39 @@ private fun ContentSection(
         Spacer(modifier = Modifier.height(8.dp))
         
         content()
+    }
+}
+
+/**
+ * Placeholder row reserved for a future custom menu (not yet wired to any
+ * content) — just a titled empty shelf so the layout space exists above
+ * Continue a Ver.
+ */
+@Composable
+private fun PlaceholderMenuRow(title: String) {
+    Column(modifier = Modifier.padding(top = 16.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(TVTextSecondary.copy(alpha = 0.3f))
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = TVTextSecondary.copy(alpha = 0.5f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+        }
     }
 }
 

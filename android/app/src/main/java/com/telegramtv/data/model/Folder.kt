@@ -14,7 +14,28 @@ data class Folder(
     @SerializedName("updated_at") val updatedAt: String,
     // Optional: file count and preview files for home screen
     @SerializedName("file_count") val fileCount: Int? = null,
-    @SerializedName("preview_files") val previewFiles: List<FileItem>? = null
+    @SerializedName("preview_files") val previewFiles: List<FileItem>? = null,
+    // Display metadata (Mídia titles) — a movie/show's own folder carries
+    // these the same way a file does (see web app's FolderResponse).
+    @SerializedName("title") val title: String? = null,
+    @SerializedName("genres") val genres: List<String> = emptyList(),
+    @SerializedName("thumbnail_url") val thumbnailUrl: String? = null
+) {
+    val displayTitle: String
+        get() = title?.takeIf { it.isNotBlank() } ?: name
+
+    val primaryGenre: String?
+        get() = genres.firstOrNull()
+}
+
+/**
+ * A title (movie/show folder) card as returned by the Destaques/Recentes/
+ * search endpoints — same shape as the web app's CategoryOverviewFolder.
+ */
+data class MediaFolderCardItem(
+    @SerializedName("folder") val folder: Folder,
+    @SerializedName("item_count") val itemCount: Int,
+    @SerializedName("cover_url") val coverUrl: String?
 )
 
 /**

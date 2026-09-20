@@ -10,6 +10,7 @@ import androidx.tv.foundation.lazy.list.TvLazyRow
 import androidx.tv.foundation.lazy.list.items
 import com.telegramtv.data.model.FileItem
 import com.telegramtv.data.model.Folder
+import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.theme.TVTextPrimary
 
 /**
@@ -59,6 +60,43 @@ fun ContentRow(
                         onClick = { onFileClick(file.id) }
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Horizontal row of title-folder poster cards ("Destaques"/"Recentes" on the
+ * TV home screen and Mídia-scoped folder search results) — mirrors
+ * [ContentRow] but for [MediaFolderCardItem] instead of [FileItem].
+ */
+@Composable
+fun FolderPosterRow(
+    title: String,
+    items: List<MediaFolderCardItem>,
+    serverUrl: String,
+    onFolderClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall,
+            color = TVTextPrimary,
+            modifier = Modifier.padding(start = 48.dp, bottom = 16.dp)
+        )
+
+        TvLazyRow(
+            contentPadding = PaddingValues(horizontal = 48.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(items, key = { it.folder.id }) { item ->
+                val thumbnailUrl = item.coverUrl?.let { "$serverUrl$it" }
+                FolderPosterCard(
+                    item = item,
+                    thumbnailUrl = thumbnailUrl,
+                    onClick = { onFolderClick(item.folder.id) }
+                )
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telegramtv.data.model.FileItem
 import com.telegramtv.data.model.Folder
+import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.data.model.TVBrowseResponse
 import com.telegramtv.data.repository.FilesRepository
 import com.telegramtv.data.repository.FoldersRepository
@@ -22,6 +23,8 @@ import javax.inject.Inject
 data class HomeUiState(
     val isLoading: Boolean = true,
     val continueWatching: List<FileItem> = emptyList(),
+    val featuredFolders: List<MediaFolderCardItem> = emptyList(),
+    val recentFolders: List<MediaFolderCardItem> = emptyList(),
     val recentFiles: List<FileItem> = emptyList(),
     val folders: List<Folder> = emptyList(),
     val serverUrl: String = "",
@@ -63,6 +66,8 @@ class HomeViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         continueWatching = browse.continueWatching,
+                        featuredFolders = browse.featuredFolders,
+                        recentFolders = browse.recentFolders,
                         recentFiles = browse.recentFiles,
                         folders = browse.folders
                     )

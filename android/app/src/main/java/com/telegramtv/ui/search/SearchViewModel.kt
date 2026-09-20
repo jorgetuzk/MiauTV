@@ -3,6 +3,7 @@ package com.telegramtv.ui.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telegramtv.data.model.FileItem
+import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.data.repository.FilesRepository
 import com.telegramtv.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,8 @@ data class SearchUiState(
     val query: String = "",
     val isSearching: Boolean = false,
     val results: List<FileItem> = emptyList(),
+    // Mídia title folders matching the query (see tv_search on the backend).
+    val folderResults: List<MediaFolderCardItem> = emptyList(),
     val hasSearched: Boolean = false,
     val serverUrl: String = "",
     val folders: List<com.telegramtv.data.model.Folder> = emptyList(),
@@ -80,6 +83,7 @@ class SearchViewModel @Inject constructor(
             } else {
                 _uiState.value = _uiState.value.copy(
                     results = emptyList(),
+                    folderResults = emptyList(),
                     hasSearched = false
                 )
             }
@@ -87,17 +91,18 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
-     * Execute search.
+     * Execute search — scoped to Mídia (see tv_search on the backend).
      */
     private suspend fun search(query: String) {
         _uiState.value = _uiState.value.copy(isSearching = true, error = null)
 
-        val result = filesRepository.searchFiles(query, limit = 50)
+        val result = filesRepository.searchTV(query)
         result.fold(
-            onSuccess = { files ->
+            onSuccess = { response ->
                 _uiState.value = _uiState.value.copy(
                     isSearching = false,
-                    results = files,
+                    results = response.files,
+                    folderResults = response.folders,
                     hasSearched = true
                 )
             },
@@ -118,6 +123,7 @@ class SearchViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             query = "",
             results = emptyList(),
+            folderResults = emptyList(),
             hasSearched = false
         )
     }

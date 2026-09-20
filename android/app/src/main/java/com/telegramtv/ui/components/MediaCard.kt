@@ -32,6 +32,7 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import coil.compose.AsyncImage
 import com.telegramtv.data.model.FileItem
+import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.theme.*
 
 /**
@@ -160,6 +161,107 @@ fun MediaCard(
                         color = TVTextSecondary
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * TV-optimized folder poster card ("Destaques"/"Recentes" rows) — same
+ * visual layout as [MediaCard] but for a title folder (movie/show), matching
+ * the web app's Mídia page which shows folders, not files, in these rows.
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun FolderPosterCard(
+    item: MediaFolderCardItem,
+    thumbnailUrl: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isFocused) 1.08f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "cardScale"
+    )
+
+    Card(
+        onClick = onClick,
+        modifier = modifier
+            .width(180.dp)
+            .scale(scale)
+            .onFocusChanged { isFocused = it.isFocused }
+            .then(
+                if (isFocused) Modifier.shadow(
+                    elevation = 12.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    ambientColor = TVAccentGlow,
+                    spotColor = TVPrimary.copy(alpha = 0.25f)
+                ) else Modifier
+            ),
+        colors = CardDefaults.colors(
+            containerColor = if (isFocused) TVCardFocused else TVCardBackground
+        ),
+        shape = CardDefaults.shape(shape = RoundedCornerShape(20.dp))
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f / 3f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(TVSurfaceVariant)
+            ) {
+                AsyncImage(
+                    model = thumbnailUrl,
+                    contentDescription = item.folder.displayTitle,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = item.folder.displayTitle,
+                style = MaterialTheme.typography.titleSmall,
+                color = TVTextPrimary,
+                fontWeight = if (isFocused) FontWeight.Bold else FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(TVSurfaceVariant)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val genre = item.folder.primaryGenre
+            if (genre != null) {
+                Text(
+                    text = genre,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TVPrimaryLight,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            } else {
+                Text(
+                    text = "${item.itemCount} itens",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TVTextSecondary
+                )
             }
         }
     }

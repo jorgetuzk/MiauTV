@@ -8,18 +8,47 @@ from sqlalchemy import select, desc
 from sqlalchemy.orm import selectinload
 
 from ..database import get_db
-from ..models import File, User, Folder, WatchProgress
+from ..models import File, User, Folder, WatchProgress, ContentType
 from ..auth import get_current_user
 from ..config import get_settings
 from ..services import (
-    escape_like, 
-    add_urls_to_file, 
-    fetch_recent_files, 
+    escape_like,
+    add_urls_to_file,
+    fetch_recent_files,
     fetch_continue_watching_files
 )
 
 router = APIRouter(prefix="/tv", tags=["TV"])
 settings = get_settings()
+
+
+async def _resolve_midia_subtype_folder_ids(db: AsyncSession, user_id: int) -> List[int]:
+    """Direct children of the user's Mídia-tagged folder(s) — i.e. Filmes/
+    Séries/Animes — the same "pool these together" set
+    build_media_folder_overview (routers/folders.py) expects. Mirrors how
+    the web app's Mídia landing page resolves this (content_types.py)."""
+    midia_type = await db.execute(
+        select(ContentType.id).where(
+            ContentType.user_id == user_id,
+            ContentType.parent_id.is_(None),
+            ContentType.slug == "midia",
+        )
+    )
+    midia_type_id = midia_type.scalar_one_or_none()
+    if midia_type_id is None:
+        return []
+
+    midia_folders = await db.execute(
+        select(Folder.id).where(Folder.user_id == user_id, Folder.content_type_id == midia_type_id)
+    )
+    midia_folder_ids = list(midia_folders.scalars().all())
+    if not midia_folder_ids:
+        return []
+
+    subtype_folders = await db.execute(
+        select(Folder.id).where(Folder.user_id == user_id, Folder.parent_id.in_(midia_folder_ids))
+    )
+    return list(subtype_folders.scalars().all())
 
 
 @router.get("/browse")
@@ -28,17 +57,21 @@ async def tv_browse(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Get TV home screen data in a single request.
-    Returns continue watching, recent files, and folders.
+    Get TV home screen data in a single request: continue watching (files),
+    featured/recent titles (Mídia folders — movies/shows, same source as the
+    web app's Mídia landing page), and the legacy flat folder list (kept for
+    backward compat, the TV client no longer renders it).
     Optimized for TV client to minimize API calls.
     """
+    from .folders import build_media_folder_overview
+
     # Get continue watching
     continue_watching = await fetch_continue_watching_files(db, current_user.id, 20)
-    
+
     # Get recent files
     recent_files = await fetch_recent_files(db, current_user.id, 20)
-    
-    # Get top-level folders
+
+    # Get top-level folders (legacy — unused by the current TV home screen)
     folders_query = (
         select(Folder)
         .where(Folder.user_id == current_user.id, Folder.parent_id == None)
@@ -46,10 +79,18 @@ async def tv_browse(
     )
     folders_result = await db.execute(folders_query)
     folders = folders_result.scalars().all()
-    
+
+    # Mídia titles (movie/show folders) for the Destaques/Recentes rows
+    subtype_ids = await _resolve_midia_subtype_folder_ids(db, current_user.id)
+    media_overview = await build_media_folder_overview(
+        db, current_user.id, subtype_ids, recent_limit=20, featured_limit=20,
+    )
+
     return {
         "continue_watching": [add_urls_to_file(f) for f in continue_watching],
         "recent": [add_urls_to_file(f) for f in recent_files],
+        "featured_folders": media_overview.featured,
+        "recent_folders": media_overview.recent,
         "folders": [
             {
                 "id": f.id,
@@ -91,12 +132,28 @@ async def tv_search(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Search files for TV client."""
-    # Search files by name
+    """Search for the TV client — scoped to Mídia only, matching the
+    folder-first (title) browsing the TV home screen uses. Files are
+    scoped to the ones physically inside the Mídia folder tree (files don't
+    reliably carry their own content_type_id — see resolve_category_
+    breadcrumb); folder results are titles (movie/show folders), matched by
+    name/title/genre, with the same cover/count enrichment as Destaques/
+    Recentes so the search result cards look identical to them."""
+    from .content_types import _recursive_folder_ids
+    from .folders import build_media_folder_overview
+
+    subtype_ids = await _resolve_midia_subtype_folder_ids(db, current_user.id)
+    if not subtype_ids:
+        return {"files": [], "folders": []}
+
+    midia_tree_ids = await _recursive_folder_ids(db, subtype_ids)
+
+    # Search files by name, scoped to the Mídia subtree
     files_query = (
         select(File)
         .where(
             File.user_id == current_user.id,
+            File.folder_id.in_(midia_tree_ids),
             File.file_name.ilike(f"%{escape_like(q)}%", escape="\\")
         )
         .options(selectinload(File.watch_progress))
@@ -105,30 +162,24 @@ async def tv_search(
     )
     files_result = await db.execute(files_query)
     files = files_result.scalars().all()
-    
-    # Search folders by name
-    folders_query = (
-        select(Folder)
-        .where(
-            Folder.user_id == current_user.id,
-            Folder.name.ilike(f"%{escape_like(q)}%", escape="\\")
-        )
-        .order_by(Folder.name)
-        .limit(20)
+
+    # Search titles (movie/show folders) by name/title/genre — reuses the
+    # same per-title cover/item_count resolution as Destaques/Recentes so
+    # a search result card matches them exactly.
+    overview = await build_media_folder_overview(
+        db, current_user.id, subtype_ids, recent_limit=0, featured_limit=0, sort="name",
     )
-    folders_result = await db.execute(folders_query)
-    folders = folders_result.scalars().all()
-    
+    needle = q.strip().lower()
+    matched_folders = [
+        entry for entry in overview.subfolders
+        if needle in entry.folder.name.lower()
+        or (entry.folder.title and needle in entry.folder.title.lower())
+        or any(needle in g.lower() for g in entry.folder.genres)
+    ][:limit]
+
     return {
         "files": [add_urls_to_file(f) for f in files],
-        "folders": [
-            {
-                "id": f.id,
-                "name": f.name,
-                "parent_id": f.parent_id
-            }
-            for f in folders
-        ]
+        "folders": matched_folders,
     }
 
 

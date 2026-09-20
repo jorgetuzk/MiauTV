@@ -30,6 +30,7 @@ import com.telegramtv.ui.theme.*
 @Composable
 fun SearchScreen(
     onFileClick: (Int) -> Unit,
+    onFolderClick: (Int) -> Unit,
     onBackClick: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -69,7 +70,7 @@ fun SearchScreen(
                     )
                 }
 
-                uiState.hasSearched && uiState.results.isEmpty() -> {
+                uiState.hasSearched && uiState.results.isEmpty() && uiState.folderResults.isEmpty() -> {
                     EmptyState(
                         title = "Nenhum resultado encontrado",
                         subtitle = "Tente um termo de busca diferente",
@@ -77,10 +78,10 @@ fun SearchScreen(
                     )
                 }
 
-                uiState.results.isNotEmpty() -> {
+                uiState.results.isNotEmpty() || uiState.folderResults.isNotEmpty() -> {
                     // Results count
                     Text(
-                        text = "${uiState.results.size} resultados",
+                        text = "${uiState.results.size + uiState.folderResults.size} resultados",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TVTextSecondary,
                         modifier = Modifier.padding(horizontal = 48.dp, vertical = 8.dp)
@@ -96,6 +97,14 @@ fun SearchScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        items(uiState.folderResults, key = { "folder_${it.folder.id}" }) { item ->
+                            val thumbnailUrl = item.coverUrl?.let { "${uiState.serverUrl}$it" }
+                            FolderPosterCard(
+                                item = item,
+                                thumbnailUrl = thumbnailUrl,
+                                onClick = { onFolderClick(item.folder.id) }
+                            )
+                        }
                         items(uiState.results, key = { it.id }) { file ->
                             val thumbnailUrl = "${uiState.serverUrl}/api/stream/${file.id}/thumbnail"
                             MediaCard(

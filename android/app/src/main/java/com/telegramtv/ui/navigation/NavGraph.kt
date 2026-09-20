@@ -122,6 +122,9 @@ fun NavGraph(
                 onFileClick = { fileId ->
                     navController.navigate(Screen.Details.createRoute(fileId))
                 },
+                onFolderClick = { folderId ->
+                    navController.navigate(Screen.Folder.createRoute(folderId))
+                },
                 onBackClick = {
                     navController.popBackStack()
                 }
