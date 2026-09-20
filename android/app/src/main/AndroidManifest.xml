@@ -52,13 +52,23 @@
             android:exported="true"
             android:icon="@drawable/app_logo"
             android:banner="@drawable/app_banner"
+            android:label="@string/app_name_tv"
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:screenOrientation="landscape">
-            
-            <!-- Leanback launcher intent filter -->
+
+            <!-- Leanback launcher intent filter — picked up automatically
+                 by proper Android TV/Google TV launchers. Also registered
+                 under the plain LAUNCHER category below so this TV UI shows
+                 up as its own icon on generic "smart TV" launchers that
+                 don't recognize LEANBACK_LAUNCHER and would otherwise only
+                 ever expose the mobile activity. -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 

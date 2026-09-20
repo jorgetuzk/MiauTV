@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">MiauTV</string>
+    <!-- Separate launcher label for the TV (Leanback) entry point, so it
+         shows up as its own icon distinct from the mobile app on launchers
+         that don't recognize LEANBACK_LAUNCHER and would otherwise only
+         ever surface the mobile activity. -->
+    <string name="app_name_tv">MiauTV (TV)</string>
 
     <!-- Home Screen -->
     <string name="continue_watching">Voltar a Ver</string>
