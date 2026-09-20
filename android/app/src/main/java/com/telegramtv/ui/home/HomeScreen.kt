@@ -126,17 +126,15 @@ fun HomeScreen(
                             }
                         }
 
-                        // "Menu 2" — genre + sort, only once a subtype is
+                        // "Menu 2" — genres, only once a subtype is
                         // selected (mirrors the web app's second-level menu
                         // that opens after picking Séries/Filmes/Animes).
-                        if (uiState.selectedSubtypeId != null) {
+                        if (uiState.selectedSubtypeId != null && uiState.genreOptions.isNotEmpty()) {
                             item {
-                                GenreSortPillRow(
+                                GenrePillRow(
                                     genres = uiState.genreOptions,
                                     selectedGenre = uiState.selectedGenre,
-                                    sort = uiState.sort,
-                                    onGenreSelect = { viewModel.selectGenre(it) },
-                                    onSortSelect = { viewModel.selectSort(it) }
+                                    onGenreSelect = { viewModel.selectGenre(it) }
                                 )
                             }
                         }
@@ -431,39 +429,23 @@ private fun CategoryPillRow(
     }
 }
 
-private val SORT_OPTIONS = listOf(
-    "recent" to "Mais recentes",
-    "oldest" to "Mais antigos",
-    "name_asc" to "Nome A-Z",
-    "name_desc" to "Nome Z-A"
-)
-
 /**
- * "Menu 2" — genre + sort pills, shown once a Mídia subtype is selected in
- * [CategoryPillRow]. Same filters as the web app's Mídia folder toolbar
- * (genre bar + sort); format/tag/author are file-level filters that don't
- * apply to the folder-poster rows shown on TV, so they're left out here.
+ * "Menu 2" — genre pills, shown once a Mídia subtype is selected in
+ * [CategoryPillRow]. Sort/format are left out for now (kept on the backend
+ * for later — see /tv/browse's sort param — just not exposed here yet).
  */
 @Composable
-private fun GenreSortPillRow(
+private fun GenrePillRow(
     genres: List<GenreCount>,
     selectedGenre: String?,
-    sort: String,
-    onGenreSelect: (String) -> Unit,
-    onSortSelect: (String) -> Unit
+    onGenreSelect: (String) -> Unit
 ) {
+    if (genres.isEmpty()) return
     TvLazyRow(
         contentPadding = PaddingValues(horizontal = 48.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(SORT_OPTIONS, key = { "sort_${it.first}" }) { (value, label) ->
-            FilterPill(
-                label = label,
-                selected = sort == value,
-                onClick = { onSortSelect(value) }
-            )
-        }
-        items(genres, key = { "genre_${it.genre}" }) { g ->
+        items(genres, key = { it.genre }) { g ->
             FilterPill(
                 label = "${g.genre} (${g.count})",
                 selected = selectedGenre == g.genre,
@@ -474,8 +456,7 @@ private fun GenreSortPillRow(
 }
 
 /**
- * Shared focusable pill used by both [CategoryPillRow] and
- * [GenreSortPillRow].
+ * Shared focusable pill used by both [CategoryPillRow] and [GenrePillRow].
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

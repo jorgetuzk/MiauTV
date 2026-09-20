@@ -4,16 +4,18 @@ TV-specific API endpoints optimized for Android TV clients.
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 from sqlalchemy.orm import selectinload
 
 from ..database import get_db
 from ..models import File, User, Folder, WatchProgress, ContentType
 from ..auth import get_current_user
 from ..config import get_settings
+from ..schemas import FolderResponse, CategoryOverviewFolder
 from ..services import (
     escape_like,
     add_urls_to_file,
+    add_urls_to_folder,
     fetch_recent_files,
     fetch_continue_watching_files
 )
@@ -23,9 +25,18 @@ settings = get_settings()
 
 
 async def _resolve_midia_folder_ids(db: AsyncSession, user_id: int) -> List[int]:
-    """The user's Mídia-tagged folder(s) — the physical folder(s) carrying
-    the Mídia content_type_id, whose direct children are the subtype
-    folders (Filmes/Séries/Animes/Hot/...)."""
+    """The user's Mídia root folder(s) — top-level (parent_id IS NULL)
+    folders carrying the Mídia content_type_id, whose direct children are
+    the subtype folders (Filmes/Séries/Animes/Hot/...).
+
+    content_type_id=Mídia isn't unique to this root folder — it's also
+    inherited/set on individual titles and files deep in the tree (e.g. a
+    show's own folder, or files tagged via TMDb) — so without the
+    parent_id IS NULL filter this would match dozens of unrelated nested
+    folders too, and every query built on top of it (subtype pills,
+    Destaques/Recentes pooling, search scoping) would silently include
+    their entire subtrees. Mirrors content_types.py's get_category_overview,
+    which resolves the same root folder the same way."""
     midia_type = await db.execute(
         select(ContentType.id).where(
             ContentType.user_id == user_id,
@@ -38,9 +49,51 @@ async def _resolve_midia_folder_ids(db: AsyncSession, user_id: int) -> List[int]
         return []
 
     midia_folders = await db.execute(
-        select(Folder.id).where(Folder.user_id == user_id, Folder.content_type_id == midia_type_id)
+        select(Folder.id).where(
+            Folder.user_id == user_id,
+            Folder.content_type_id == midia_type_id,
+            Folder.parent_id.is_(None),
+        )
     )
     return list(midia_folders.scalars().all())
+
+
+async def _build_subtype_pills(db: AsyncSession, root_ids: List[int]) -> List[CategoryOverviewFolder]:
+    """Direct children of `root_ids` (the Mídia root folder(s)) — the
+    category pill menu itself (Séries/Filmes/Animes/Hot). item_count is how
+    many TITLE folders (movies/shows) sit directly inside each one — folders,
+    not files. (The web app's own quick-nav pill bar, content_types.py's
+    _build_subtype_entries, is deliberately file-counted instead — this is a
+    TV-specific choice, since a folder count is what actually matches what
+    picking that pill scopes Destaques/Recentes down to.)"""
+    if not root_ids:
+        return []
+
+    from .folders import _auto_cover_url
+
+    result = await db.execute(
+        select(Folder).where(Folder.parent_id.in_(root_ids)).order_by(Folder.name)
+    )
+    subfolders = result.scalars().all()
+    if not subfolders:
+        return []
+
+    count_rows = await db.execute(
+        select(Folder.parent_id, func.count(Folder.id))
+        .where(Folder.parent_id.in_([f.id for f in subfolders]))
+        .group_by(Folder.parent_id)
+    )
+    title_counts = dict(count_rows.all())
+
+    entries = []
+    for subfolder in subfolders:
+        item_count = title_counts.get(subfolder.id, 0)
+        auto_cover_url = None if subfolder.custom_thumbnail_file_id else await _auto_cover_url(db, subfolder.id)
+        folder_response = FolderResponse(**add_urls_to_folder(subfolder, item_count, auto_cover_url))
+        entries.append(CategoryOverviewFolder(
+            folder=folder_response, item_count=item_count, cover_url=folder_response.thumbnail_url,
+        ))
+    return entries
 
 
 async def _resolve_midia_subtype_folder_ids(db: AsyncSession, user_id: int) -> List[int]:
@@ -101,12 +154,7 @@ async def tv_browse(
     # category pill menu ("Menu 1"). Always the full unfiltered set,
     # regardless of which one is currently selected.
     midia_folder_ids = await _resolve_midia_folder_ids(db, current_user.id)
-    subtype_folders = []
-    if midia_folder_ids:
-        subtype_overview = await build_media_folder_overview(
-            db, current_user.id, midia_folder_ids, recent_limit=0, featured_limit=0, sort="name_asc",
-        )
-        subtype_folders = subtype_overview.subfolders
+    subtype_folders = await _build_subtype_pills(db, midia_folder_ids)
 
     # Mídia titles (movie/show folders) for the Destaques/Recentes rows —
     # pooled across every subtype by default, or scoped to a single one

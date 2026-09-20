@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
@@ -41,14 +42,15 @@ import com.telegramtv.ui.theme.*
  * TV-optimized media card ("Recentes" row / search results) — cover-only
  * poster (2:3); title and genre only appear as a fade-in overlay on focus.
  *
- * The card's own outer size (on the [Card] modifier) never changes on
- * focus — only an inner [Box] is scaled. TV's lazy rows compute their
- * "bring focused item into view" scroll using the focused node's own
- * layout bounds; if the scale were applied to that same node, its reported
- * bounds would grow too and the whole row would jump/shift every time a
- * card gets focused. Scaling an inner child instead keeps the row's
- * scroll math untouched — the card visually zooms in place with no layout
- * side effects on its neighbors.
+ * Only the [AsyncImage] itself scales on focus — the card's own outer size,
+ * the badge, the progress bar and the title/genre overlay all stay fixed.
+ * Two reasons: (1) TV's lazy rows compute their "bring focused item into
+ * view" scroll from the focused node's own layout bounds, so if anything
+ * on that node grew, the whole row would jump on every focus change; (2)
+ * the overlay is sized as a fraction of the card, so if it scaled up too
+ * it could outgrow the card's clipped bounds and clip its own text. The
+ * picture zooms in place, cropped to the fixed card frame; everything else
+ * stays put.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -59,13 +61,13 @@ fun MediaCard(
     modifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.1f else 1f,
+    val imageScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.12f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         ),
-        label = "cardScale"
+        label = "imageScale"
     )
     val overlayAlpha by animateFloatAsState(
         targetValue = if (isFocused) 1f else 0f,
@@ -94,12 +96,14 @@ fun MediaCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .scale(scale)
+                .clip(RoundedCornerShape(16.dp))
         ) {
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = file.displayTitle,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(imageScale),
                 contentScale = ContentScale.Crop
             )
 
@@ -184,13 +188,13 @@ fun FolderPosterCard(
     modifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.1f else 1f,
+    val imageScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.12f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         ),
-        label = "cardScale"
+        label = "imageScale"
     )
     val overlayAlpha by animateFloatAsState(
         targetValue = if (isFocused) 1f else 0f,
@@ -219,12 +223,14 @@ fun FolderPosterCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .scale(scale)
+                .clip(RoundedCornerShape(16.dp))
         ) {
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = item.folder.displayTitle,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(imageScale),
                 contentScale = ContentScale.Crop
             )
 
@@ -314,10 +320,8 @@ private fun FileTypeBadge(
 /**
  * Large media card variant for featured content ("Voltar a Ver") — kept as
  * the original landscape thumbnail with overlaid title/metadata. Like
- * [MediaCard]/[FolderPosterCard], the focus scale is applied to an inner
- * Box only, so the Card's own (unscaled) bounds are what the row uses for
- * its focus-scroll math — the card zooms in place instead of pushing/
- * shifting its neighbors.
+ * [MediaCard]/[FolderPosterCard], only the image scales on focus — the
+ * card's own bounds, the gradient overlay, badge and progress bar stay put.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -328,13 +332,13 @@ fun LargeMediaCard(
     modifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.06f else 1f,
+    val imageScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.08f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         ),
-        label = "cardScale"
+        label = "imageScale"
     )
 
     Card(
@@ -358,12 +362,14 @@ fun LargeMediaCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .scale(scale)
+                .clip(RoundedCornerShape(16.dp))
         ) {
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = file.fileName,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(imageScale),
                 contentScale = ContentScale.Crop
             )
 
