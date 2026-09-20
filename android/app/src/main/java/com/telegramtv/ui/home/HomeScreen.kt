@@ -33,6 +33,8 @@ import androidx.tv.foundation.lazy.list.items
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import com.telegramtv.data.model.GenreCount
+import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.components.*
 import com.telegramtv.ui.theme.*
 
@@ -111,13 +113,32 @@ fun HomeScreen(
                             }
                         }
 
-                        // Placeholder menu rows, reserved for future custom
-                        // menus — shown right after Continue a Ver.
-                        item {
-                            PlaceholderMenuRow(title = "Menu 1")
+                        // "Menu 1" — Mídia subtype categories (Séries/
+                        // Filmes/Animes/Hot/...), same logic as the web
+                        // app's Mídia page category pill bar.
+                        if (uiState.subtypeFolders.isNotEmpty()) {
+                            item {
+                                CategoryPillRow(
+                                    subtypeFolders = uiState.subtypeFolders,
+                                    selectedId = uiState.selectedSubtypeId,
+                                    onSelect = { viewModel.selectSubtype(it) }
+                                )
+                            }
                         }
-                        item {
-                            PlaceholderMenuRow(title = "Menu 2")
+
+                        // "Menu 2" — genre + sort, only once a subtype is
+                        // selected (mirrors the web app's second-level menu
+                        // that opens after picking Séries/Filmes/Animes).
+                        if (uiState.selectedSubtypeId != null) {
+                            item {
+                                GenreSortPillRow(
+                                    genres = uiState.genreOptions,
+                                    selectedGenre = uiState.selectedGenre,
+                                    sort = uiState.sort,
+                                    onGenreSelect = { viewModel.selectGenre(it) },
+                                    onSortSelect = { viewModel.selectSort(it) }
+                                )
+                            }
                         }
 
                         // Destaques section — Mídia title folders, same
@@ -378,66 +399,116 @@ private fun ContentSection(
 }
 
 /**
- * Placeholder row reserved for a future custom menu (not yet wired to any
- * content) — a row of focusable empty slots so it's actually reachable with
- * the remote's D-pad, not just a static header.
+ * "Menu 1" — the Mídia subtype category pill bar (Séries/Filmes/Animes/
+ * Hot/...), same navigation logic as the web app's Mídia page category
+ * bar: "Visão geral" pools every subtype, picking one scopes Destaques/
+ * Recentes to just that subtype. No header label — the pills are the row.
+ */
+@Composable
+private fun CategoryPillRow(
+    subtypeFolders: List<MediaFolderCardItem>,
+    selectedId: Int?,
+    onSelect: (Int?) -> Unit
+) {
+    TvLazyRow(
+        contentPadding = PaddingValues(horizontal = 48.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            FilterPill(
+                label = "Visão geral",
+                selected = selectedId == null,
+                onClick = { onSelect(null) }
+            )
+        }
+        items(subtypeFolders, key = { it.folder.id }) { entry ->
+            FilterPill(
+                label = "${entry.folder.displayTitle} (${entry.itemCount})",
+                selected = selectedId == entry.folder.id,
+                onClick = { onSelect(entry.folder.id) }
+            )
+        }
+    }
+}
+
+private val SORT_OPTIONS = listOf(
+    "recent" to "Mais recentes",
+    "oldest" to "Mais antigos",
+    "name_asc" to "Nome A-Z",
+    "name_desc" to "Nome Z-A"
+)
+
+/**
+ * "Menu 2" — genre + sort pills, shown once a Mídia subtype is selected in
+ * [CategoryPillRow]. Same filters as the web app's Mídia folder toolbar
+ * (genre bar + sort); format/tag/author are file-level filters that don't
+ * apply to the folder-poster rows shown on TV, so they're left out here.
+ */
+@Composable
+private fun GenreSortPillRow(
+    genres: List<GenreCount>,
+    selectedGenre: String?,
+    sort: String,
+    onGenreSelect: (String) -> Unit,
+    onSortSelect: (String) -> Unit
+) {
+    TvLazyRow(
+        contentPadding = PaddingValues(horizontal = 48.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(SORT_OPTIONS, key = { "sort_${it.first}" }) { (value, label) ->
+            FilterPill(
+                label = label,
+                selected = sort == value,
+                onClick = { onSortSelect(value) }
+            )
+        }
+        items(genres, key = { "genre_${it.genre}" }) { g ->
+            FilterPill(
+                label = "${g.genre} (${g.count})",
+                selected = selectedGenre == g.genre,
+                onClick = { onGenreSelect(g.genre) }
+            )
+        }
+    }
+}
+
+/**
+ * Shared focusable pill used by both [CategoryPillRow] and
+ * [GenreSortPillRow].
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun PlaceholderMenuRow(title: String) {
-    Column(modifier = Modifier.padding(top = 16.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(24.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(TVTextSecondary.copy(alpha = 0.3f))
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = TVTextSecondary.copy(alpha = 0.5f),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TvLazyRow(
-            contentPadding = PaddingValues(horizontal = 48.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(4) { index ->
-                var isFocused by remember { mutableStateOf(false) }
-                Card(
-                    onClick = {},
-                    modifier = Modifier
-                        .width(160.dp)
-                        .height(72.dp)
-                        .onFocusChanged { isFocused = it.isFocused },
-                    colors = CardDefaults.colors(
-                        containerColor = if (isFocused) TVCardFocused else TVCardBackground.copy(alpha = 0.5f)
-                    ),
-                    shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp))
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Em breve",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = TVTextSecondary.copy(alpha = if (isFocused) 0.9f else 0.4f)
-                        )
-                    }
-                }
+private fun FilterPill(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    Card(
+        onClick = onClick,
+        modifier = Modifier.onFocusChanged { isFocused = it.isFocused },
+        colors = CardDefaults.colors(
+            containerColor = when {
+                isFocused -> TVPrimary
+                selected -> TVPrimary.copy(alpha = 0.22f)
+                else -> TVCardBackground
             }
-        }
+        ),
+        shape = CardDefaults.shape(shape = RoundedCornerShape(20.dp))
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+            style = MaterialTheme.typography.labelMedium,
+            color = when {
+                isFocused -> Color.Black
+                selected -> TVPrimaryLight
+                else -> TVTextSecondary
+            },
+            fontWeight = if (selected || isFocused) FontWeight.Bold else FontWeight.Normal,
+            maxLines = 1
+        )
     }
 }
 

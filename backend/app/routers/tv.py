@@ -1,7 +1,7 @@
 """
 TV-specific API endpoints optimized for Android TV clients.
 """
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
@@ -22,11 +22,10 @@ router = APIRouter(prefix="/tv", tags=["TV"])
 settings = get_settings()
 
 
-async def _resolve_midia_subtype_folder_ids(db: AsyncSession, user_id: int) -> List[int]:
-    """Direct children of the user's Mídia-tagged folder(s) — i.e. Filmes/
-    Séries/Animes — the same "pool these together" set
-    build_media_folder_overview (routers/folders.py) expects. Mirrors how
-    the web app's Mídia landing page resolves this (content_types.py)."""
+async def _resolve_midia_folder_ids(db: AsyncSession, user_id: int) -> List[int]:
+    """The user's Mídia-tagged folder(s) — the physical folder(s) carrying
+    the Mídia content_type_id, whose direct children are the subtype
+    folders (Filmes/Séries/Animes/Hot/...)."""
     midia_type = await db.execute(
         select(ContentType.id).where(
             ContentType.user_id == user_id,
@@ -41,7 +40,15 @@ async def _resolve_midia_subtype_folder_ids(db: AsyncSession, user_id: int) -> L
     midia_folders = await db.execute(
         select(Folder.id).where(Folder.user_id == user_id, Folder.content_type_id == midia_type_id)
     )
-    midia_folder_ids = list(midia_folders.scalars().all())
+    return list(midia_folders.scalars().all())
+
+
+async def _resolve_midia_subtype_folder_ids(db: AsyncSession, user_id: int) -> List[int]:
+    """Direct children of the user's Mídia-tagged folder(s) — i.e. Filmes/
+    Séries/Animes/Hot — the same "pool these together" set
+    build_media_folder_overview (routers/folders.py) expects. Mirrors how
+    the web app's Mídia landing page resolves this (content_types.py)."""
+    midia_folder_ids = await _resolve_midia_folder_ids(db, user_id)
     if not midia_folder_ids:
         return []
 
@@ -53,15 +60,25 @@ async def _resolve_midia_subtype_folder_ids(db: AsyncSession, user_id: int) -> L
 
 @router.get("/browse")
 async def tv_browse(
+    type_id: Optional[int] = Query(
+        None,
+        description="Scope Destaques/Recentes to a single Mídia subtype folder "
+        "(Séries/Filmes/Animes/Hot/...) — one of subtype_folders' ids. Omit to "
+        "pool every subtype together (the default landing view).",
+    ),
+    genre: Optional[str] = Query(None, description="Filter Destaques/Recentes by genre."),
+    sort: str = Query("recent", description="recent | oldest | name_asc | name_desc"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
     Get TV home screen data in a single request: continue watching (files),
-    featured/recent titles (Mídia folders — movies/shows, same source as the
-    web app's Mídia landing page), and the legacy flat folder list (kept for
-    backward compat, the TV client no longer renders it).
-    Optimized for TV client to minimize API calls.
+    the Mídia subtype folders themselves (Séries/Filmes/Animes/Hot — for the
+    category pill menu), featured/recent titles (Mídia folders —
+    movies/shows, same source as the web app's Mídia landing page, optionally
+    scoped to a single subtype and filtered by genre/sort), and the legacy
+    flat folder list (kept for backward compat, the TV client no longer
+    renders it). Optimized for TV client to minimize API calls.
     """
     from .folders import build_media_folder_overview
 
@@ -80,17 +97,39 @@ async def tv_browse(
     folders_result = await db.execute(folders_query)
     folders = folders_result.scalars().all()
 
-    # Mídia titles (movie/show folders) for the Destaques/Recentes rows
+    # The subtype folders themselves (Séries/Filmes/Animes/Hot) — the
+    # category pill menu ("Menu 1"). Always the full unfiltered set,
+    # regardless of which one is currently selected.
+    midia_folder_ids = await _resolve_midia_folder_ids(db, current_user.id)
+    subtype_folders = []
+    if midia_folder_ids:
+        subtype_overview = await build_media_folder_overview(
+            db, current_user.id, midia_folder_ids, recent_limit=0, featured_limit=0, sort="name_asc",
+        )
+        subtype_folders = subtype_overview.subfolders
+
+    # Mídia titles (movie/show folders) for the Destaques/Recentes rows —
+    # pooled across every subtype by default, or scoped to a single one
+    # (type_id) when a category pill is selected. genre/sort passed through
+    # the same way the web app's Mídia page does.
     subtype_ids = await _resolve_midia_subtype_folder_ids(db, current_user.id)
-    media_overview = await build_media_folder_overview(
-        db, current_user.id, subtype_ids, recent_limit=20, featured_limit=20,
-    )
+    scope_ids = [type_id] if (type_id is not None and type_id in subtype_ids) else subtype_ids
+
+    featured_folders = []
+    recent_folders = []
+    if scope_ids:
+        media_overview = await build_media_folder_overview(
+            db, current_user.id, scope_ids, recent_limit=20, featured_limit=20, sort=sort, genre=genre,
+        )
+        featured_folders = media_overview.featured
+        recent_folders = media_overview.recent
 
     return {
         "continue_watching": [add_urls_to_file(f) for f in continue_watching],
         "recent": [add_urls_to_file(f) for f in recent_files],
-        "featured_folders": media_overview.featured,
-        "recent_folders": media_overview.recent,
+        "subtype_folders": subtype_folders,
+        "featured_folders": featured_folders,
+        "recent_folders": recent_folders,
         "folders": [
             {
                 "id": f.id,

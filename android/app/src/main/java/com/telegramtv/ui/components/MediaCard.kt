@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
@@ -38,9 +39,16 @@ import com.telegramtv.ui.theme.*
 
 /**
  * TV-optimized media card ("Recentes" row / search results) — cover-only
- * poster (2:3); title and genre only appear as a fade-in overlay on focus,
- * to keep the row compact instead of always reserving space below the
- * cover for text.
+ * poster (2:3); title and genre only appear as a fade-in overlay on focus.
+ *
+ * The card's own outer size (on the [Card] modifier) never changes on
+ * focus — only an inner [Box] is scaled. TV's lazy rows compute their
+ * "bring focused item into view" scroll using the focused node's own
+ * layout bounds; if the scale were applied to that same node, its reported
+ * bounds would grow too and the whole row would jump/shift every time a
+ * card gets focused. Scaling an inner child instead keeps the row's
+ * scroll math untouched — the card visually zooms in place with no layout
+ * side effects on its neighbors.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -52,7 +60,7 @@ fun MediaCard(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.08f else 1f,
+        targetValue = if (isFocused) 1.1f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
@@ -70,7 +78,7 @@ fun MediaCard(
         modifier = modifier
             .width(160.dp)
             .aspectRatio(2f / 3f)
-            .scale(scale)
+            .zIndex(if (isFocused) 1f else 0f)
             .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) Modifier.shadow(
@@ -83,7 +91,11 @@ fun MediaCard(
         colors = CardDefaults.colors(containerColor = TVCardBackground),
         shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .scale(scale)
+        ) {
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = file.displayTitle,
@@ -111,19 +123,26 @@ fun MediaCard(
             }
 
             // Hover overlay: title + genre fade in over the cover, on focus.
+            // Sized to a fixed fraction of the card (not wrap-content) so a
+            // two-line title plus a genre line always has guaranteed room,
+            // regardless of how long the text is.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight(0.42f)
                     .align(Alignment.BottomCenter)
                     .alpha(overlayAlpha)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f))
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f))
                         )
                     )
-                    .padding(top = 32.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                ) {
                     Text(
                         text = file.displayTitle,
                         style = MaterialTheme.typography.titleSmall,
@@ -141,7 +160,7 @@ fun MediaCard(
                             fontWeight = FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 2.dp)
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                 }
@@ -166,7 +185,7 @@ fun FolderPosterCard(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.08f else 1f,
+        targetValue = if (isFocused) 1.1f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
@@ -184,7 +203,7 @@ fun FolderPosterCard(
         modifier = modifier
             .width(160.dp)
             .aspectRatio(2f / 3f)
-            .scale(scale)
+            .zIndex(if (isFocused) 1f else 0f)
             .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) Modifier.shadow(
@@ -197,7 +216,11 @@ fun FolderPosterCard(
         colors = CardDefaults.colors(containerColor = TVCardBackground),
         shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .scale(scale)
+        ) {
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = item.folder.displayTitle,
@@ -209,16 +232,20 @@ fun FolderPosterCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight(0.42f)
                     .align(Alignment.BottomCenter)
                     .alpha(overlayAlpha)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f))
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f))
                         )
                     )
-                    .padding(top = 32.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                ) {
                     Text(
                         text = item.folder.displayTitle,
                         style = MaterialTheme.typography.titleSmall,
@@ -236,7 +263,7 @@ fun FolderPosterCard(
                             fontWeight = FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 2.dp)
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                 }
@@ -286,8 +313,11 @@ private fun FileTypeBadge(
 
 /**
  * Large media card variant for featured content ("Voltar a Ver") — kept as
- * the original landscape thumbnail with overlaid title/metadata, since
- * that's the one row whose existing look the user explicitly wants to keep.
+ * the original landscape thumbnail with overlaid title/metadata. Like
+ * [MediaCard]/[FolderPosterCard], the focus scale is applied to an inner
+ * Box only, so the Card's own (unscaled) bounds are what the row uses for
+ * its focus-scroll math — the card zooms in place instead of pushing/
+ * shifting its neighbors.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -299,7 +329,7 @@ fun LargeMediaCard(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.05f else 1f,
+        targetValue = if (isFocused) 1.06f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
@@ -312,7 +342,7 @@ fun LargeMediaCard(
         modifier = modifier
             .width(320.dp)
             .height(220.dp)
-            .scale(scale)
+            .zIndex(if (isFocused) 1f else 0f)
             .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) Modifier.shadow(
@@ -322,12 +352,14 @@ fun LargeMediaCard(
                     spotColor = TVPrimary.copy(alpha = 0.3f)
                 ) else Modifier
             ),
-        colors = CardDefaults.colors(
-            containerColor = if (isFocused) TVCardFocused else TVCardBackground
-        ),
+        colors = CardDefaults.colors(containerColor = TVCardBackground),
         shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .scale(scale)
+        ) {
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = file.fileName,

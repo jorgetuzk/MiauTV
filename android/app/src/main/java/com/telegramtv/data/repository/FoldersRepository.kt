@@ -6,6 +6,7 @@ import com.telegramtv.data.model.FolderDetail
 import com.telegramtv.data.model.FolderWithChildren
 import com.telegramtv.data.model.FolderCreate
 import com.telegramtv.data.model.FolderUpdate
+import com.telegramtv.data.model.GenreCount
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -109,6 +110,23 @@ class FoldersRepository @Inject constructor(
                 Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Falha ao buscar árvore de pastas"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Genre counts for a folder's direct children — powers the Mídia genre
+     * pill bar ("Menu 2" on TV) once a subtype folder is selected.
+     */
+    suspend fun getFolderGenres(folderId: Int): Result<List<GenreCount>> {
+        return try {
+            val response = api.getFolderGenres(folderId)
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Falha ao buscar gêneros"))
             }
         } catch (e: Exception) {
             Result.failure(e)

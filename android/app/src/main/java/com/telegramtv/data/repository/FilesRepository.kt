@@ -140,11 +140,17 @@ class FilesRepository @Inject constructor(
     }
 
     /**
-     * Get TV browse data (continue watching, recent, folders).
+     * Get TV browse data (continue watching, subtype pills, Destaques/
+     * Recentes), optionally scoped to a subtype folder (typeId) and
+     * filtered/ordered by genre/sort.
      */
-    suspend fun getTVBrowse(): Result<TVBrowseResponse> {
+    suspend fun getTVBrowse(
+        typeId: Int? = null,
+        genre: String? = null,
+        sort: String = "recent"
+    ): Result<TVBrowseResponse> {
         return try {
-            val response = api.getTVBrowse()
+            val response = api.getTVBrowse(typeId, genre, sort)
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {

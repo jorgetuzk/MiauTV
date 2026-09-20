@@ -153,6 +153,13 @@ interface MiauTVApi {
         @Query("move_files_to") moveFilesTo: Int? = null
     ): Response<Unit>
 
+    /**
+     * Genre counts for a folder's direct children (movies/shows) — powers
+     * the Mídia genre pill bar ("Menu 2" on TV).
+     */
+    @GET("folders/{id}/genres")
+    suspend fun getFolderGenres(@Path("id") folderId: Int): Response<List<GenreCount>>
+
 
     // ============ Watch Progress ============
 
@@ -175,10 +182,17 @@ interface MiauTVApi {
     // ============ TV-Specific Endpoints ============
 
     /**
-     * Get TV browse data (continue watching, recent, folders) in one call.
+     * Get TV browse data (continue watching, subtype pills, Destaques/
+     * Recentes) in one call. typeId scopes Destaques/Recentes to a single
+     * Mídia subtype folder ("Menu 1" selection); genre/sort filter/order
+     * them ("Menu 2").
      */
     @GET("tv/browse")
-    suspend fun getTVBrowse(): Response<TVBrowseResponse>
+    suspend fun getTVBrowse(
+        @Query("type_id") typeId: Int? = null,
+        @Query("genre") genre: String? = null,
+        @Query("sort") sort: String = "recent"
+    ): Response<TVBrowseResponse>
 
     /**
      * Get continue watching list.
