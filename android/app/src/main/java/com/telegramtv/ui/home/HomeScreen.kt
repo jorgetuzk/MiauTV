@@ -28,6 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.foundation.lazy.list.TvLazyColumn
+import androidx.tv.foundation.lazy.list.TvLazyRow
+import androidx.tv.foundation.lazy.list.items
+import androidx.tv.material3.Card
+import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.ExperimentalTvMaterial3Api
 import com.telegramtv.ui.components.*
 import com.telegramtv.ui.theme.*
 
@@ -84,18 +89,9 @@ fun HomeScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .focusRequester(focusRequester),
-                        contentPadding = PaddingValues(bottom = 48.dp),
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Placeholder menu rows, reserved for future custom
-                        // menus — shown above Continue a Ver.
-                        item {
-                            PlaceholderMenuRow(title = "Menu 1")
-                        }
-                        item {
-                            PlaceholderMenuRow(title = "Menu 2")
-                        }
-
                         // Continue Watching section
                         if (uiState.continueWatching.isNotEmpty()) {
                             item {
@@ -113,6 +109,15 @@ fun HomeScreen(
                                     )
                                 }
                             }
+                        }
+
+                        // Placeholder menu rows, reserved for future custom
+                        // menus — shown right after Continue a Ver.
+                        item {
+                            PlaceholderMenuRow(title = "Menu 1")
+                        }
+                        item {
+                            PlaceholderMenuRow(title = "Menu 2")
                         }
 
                         // Destaques section — Mídia title folders, same
@@ -374,9 +379,10 @@ private fun ContentSection(
 
 /**
  * Placeholder row reserved for a future custom menu (not yet wired to any
- * content) — just a titled empty shelf so the layout space exists above
- * Continue a Ver.
+ * content) — a row of focusable empty slots so it's actually reachable with
+ * the remote's D-pad, not just a static header.
  */
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun PlaceholderMenuRow(title: String) {
     Column(modifier = Modifier.padding(top = 16.dp)) {
@@ -401,6 +407,36 @@ private fun PlaceholderMenuRow(title: String) {
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TvLazyRow(
+            contentPadding = PaddingValues(horizontal = 48.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(4) { index ->
+                var isFocused by remember { mutableStateOf(false) }
+                Card(
+                    onClick = {},
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(72.dp)
+                        .onFocusChanged { isFocused = it.isFocused },
+                    colors = CardDefaults.colors(
+                        containerColor = if (isFocused) TVCardFocused else TVCardBackground.copy(alpha = 0.5f)
+                    ),
+                    shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp))
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Em breve",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TVTextSecondary.copy(alpha = if (isFocused) 0.9f else 0.4f)
+                        )
+                    }
+                }
+            }
         }
     }
 }

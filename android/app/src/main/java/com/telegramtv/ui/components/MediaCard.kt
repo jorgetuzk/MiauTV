@@ -2,6 +2,7 @@ package com.telegramtv.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,7 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.graphicsLayer
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
@@ -36,9 +37,10 @@ import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.theme.*
 
 /**
- * TV-optimized media card ("Add Recente" row) — a vertical poster card
- * (2:3 cover, title below, genre chip) matching the web app's Mídia card
- * layout (MediaFolderCard/MediaFileCard.tsx).
+ * TV-optimized media card ("Recentes" row / search results) — cover-only
+ * poster (2:3); title and genre only appear as a fade-in overlay on focus,
+ * to keep the row compact instead of always reserving space below the
+ * cover for text.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -57,109 +59,91 @@ fun MediaCard(
         ),
         label = "cardScale"
     )
+    val overlayAlpha by animateFloatAsState(
+        targetValue = if (isFocused) 1f else 0f,
+        animationSpec = tween(200),
+        label = "overlayAlpha"
+    )
 
     Card(
         onClick = onClick,
         modifier = modifier
-            .width(180.dp)
+            .width(160.dp)
+            .aspectRatio(2f / 3f)
             .scale(scale)
             .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) Modifier.shadow(
                     elevation = 12.dp,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(16.dp),
                     ambientColor = TVAccentGlow,
                     spotColor = TVPrimary.copy(alpha = 0.25f)
                 ) else Modifier
             ),
-        colors = CardDefaults.colors(
-            containerColor = if (isFocused) TVCardFocused else TVCardBackground
-        ),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(20.dp))
+        colors = CardDefaults.colors(containerColor = TVCardBackground),
+        shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            // Poster (2:3, like a TMDB cover)
-            Box(
+        Box(modifier = Modifier.fillMaxSize()) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = file.displayTitle,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            FileTypeBadge(
+                fileName = file.fileName,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(2f / 3f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(TVSurfaceVariant)
-            ) {
-                AsyncImage(
-                    model = thumbnailUrl,
-                    contentDescription = file.displayTitle,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+            )
 
-                FileTypeBadge(
-                    fileName = file.fileName,
+            if (file.progressPercent > 0f) {
+                LinearProgressIndicator(
+                    progress = { file.progressPercent / 100f },
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .align(Alignment.BottomCenter),
+                    color = TVPrimary,
+                    trackColor = TVProgressBackground
                 )
-
-                if (file.progressPercent > 0f) {
-                    LinearProgressIndicator(
-                        progress = { file.progressPercent / 100f },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .align(Alignment.BottomCenter),
-                        color = TVPrimary,
-                        trackColor = TVProgressBackground
-                    )
-                }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = file.displayTitle,
-                style = MaterialTheme.typography.titleSmall,
-                color = TVTextPrimary,
-                fontWeight = if (isFocused) FontWeight.Bold else FontWeight.SemiBold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Divider, same visual break as the web card's title/meta split
+            // Hover overlay: title + genre fade in over the cover, on focus.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(1.dp)
-                    .background(TVSurfaceVariant)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val genre = file.primaryGenre
-            if (genre != null) {
-                Text(
-                    text = genre,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TVPrimaryLight,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    file.formattedDuration?.let { duration ->
+                    .align(Alignment.BottomCenter)
+                    .graphicsLayer { alpha = overlayAlpha }
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f))
+                        )
+                    )
+                    .padding(top = 32.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
+            ) {
+                Column {
+                    Text(
+                        text = file.displayTitle,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = TVTextPrimary,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    val genre = file.primaryGenre
+                    if (genre != null) {
                         Text(
-                            text = duration,
+                            text = genre,
                             style = MaterialTheme.typography.labelSmall,
-                            color = TVTextSecondary
+                            color = TVPrimaryLight,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 2.dp)
                         )
                     }
-                    Text(
-                        text = file.formattedSize,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TVTextSecondary
-                    )
                 }
             }
         }
@@ -168,8 +152,9 @@ fun MediaCard(
 
 /**
  * TV-optimized folder poster card ("Destaques"/"Recentes" rows) — same
- * visual layout as [MediaCard] but for a title folder (movie/show), matching
- * the web app's Mídia page which shows folders, not files, in these rows.
+ * cover-only + hover-overlay layout as [MediaCard] but for a title folder
+ * (movie/show), matching the web app's Mídia page which shows folders, not
+ * files, in these rows.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -188,80 +173,73 @@ fun FolderPosterCard(
         ),
         label = "cardScale"
     )
+    val overlayAlpha by animateFloatAsState(
+        targetValue = if (isFocused) 1f else 0f,
+        animationSpec = tween(200),
+        label = "overlayAlpha"
+    )
 
     Card(
         onClick = onClick,
         modifier = modifier
-            .width(180.dp)
+            .width(160.dp)
+            .aspectRatio(2f / 3f)
             .scale(scale)
             .onFocusChanged { isFocused = it.isFocused }
             .then(
                 if (isFocused) Modifier.shadow(
                     elevation = 12.dp,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(16.dp),
                     ambientColor = TVAccentGlow,
                     spotColor = TVPrimary.copy(alpha = 0.25f)
                 ) else Modifier
             ),
-        colors = CardDefaults.colors(
-            containerColor = if (isFocused) TVCardFocused else TVCardBackground
-        ),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(20.dp))
+        colors = CardDefaults.colors(containerColor = TVCardBackground),
+        shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = item.folder.displayTitle,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // Hover overlay: title + genre fade in over the cover, on focus.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(2f / 3f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(TVSurfaceVariant)
+                    .align(Alignment.BottomCenter)
+                    .graphicsLayer { alpha = overlayAlpha }
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f))
+                        )
+                    )
+                    .padding(top = 32.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
             ) {
-                AsyncImage(
-                    model = thumbnailUrl,
-                    contentDescription = item.folder.displayTitle,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = item.folder.displayTitle,
-                style = MaterialTheme.typography.titleSmall,
-                color = TVTextPrimary,
-                fontWeight = if (isFocused) FontWeight.Bold else FontWeight.SemiBold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(TVSurfaceVariant)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val genre = item.folder.primaryGenre
-            if (genre != null) {
-                Text(
-                    text = genre,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TVPrimaryLight,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            } else {
-                Text(
-                    text = "${item.itemCount} itens",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TVTextSecondary
-                )
+                Column {
+                    Text(
+                        text = item.folder.displayTitle,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = TVTextPrimary,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    val genre = item.folder.primaryGenre
+                    if (genre != null) {
+                        Text(
+                            text = genre,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TVPrimaryLight,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
             }
         }
     }
