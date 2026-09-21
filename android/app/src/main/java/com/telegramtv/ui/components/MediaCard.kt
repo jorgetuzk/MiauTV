@@ -28,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
@@ -39,145 +38,10 @@ import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.theme.*
 
 /**
- * TV-optimized media card ("Recentes" row / search results) — cover-only
- * poster (2:3); title and genre only appear as a fade-in overlay on focus.
- *
- * Only the [AsyncImage] itself scales on focus — the card's own outer size,
- * the badge, the progress bar and the title/genre overlay all stay fixed.
- * Two reasons: (1) TV's lazy rows compute their "bring focused item into
- * view" scroll from the focused node's own layout bounds, so if anything
- * on that node grew, the whole row would jump on every focus change; (2)
- * the overlay is sized as a fraction of the card, so if it scaled up too
- * it could outgrow the card's clipped bounds and clip its own text. The
- * picture zooms in place, cropped to the fixed card frame; everything else
- * stays put.
- */
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-fun MediaCard(
-    file: FileItem,
-    thumbnailUrl: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var isFocused by remember { mutableStateOf(false) }
-    val imageScale by animateFloatAsState(
-        targetValue = if (isFocused) 1.12f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "imageScale"
-    )
-    val overlayAlpha by animateFloatAsState(
-        targetValue = if (isFocused) 1f else 0f,
-        animationSpec = tween(200),
-        label = "overlayAlpha"
-    )
-
-    Card(
-        onClick = onClick,
-        modifier = modifier
-            .width(160.dp)
-            .aspectRatio(2f / 3f)
-            .zIndex(if (isFocused) 1f else 0f)
-            .onFocusChanged { isFocused = it.isFocused }
-            .then(
-                if (isFocused) Modifier.shadow(
-                    elevation = 12.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    ambientColor = TVAccentGlow,
-                    spotColor = TVPrimary.copy(alpha = 0.25f)
-                ) else Modifier
-            ),
-        colors = CardDefaults.colors(containerColor = TVCardBackground),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(16.dp))
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(16.dp))
-        ) {
-            AsyncImage(
-                model = thumbnailUrl,
-                contentDescription = file.displayTitle,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .scale(imageScale),
-                contentScale = ContentScale.Crop
-            )
-
-            FileTypeBadge(
-                fileName = file.fileName,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-            )
-
-            if (file.progressPercent > 0f) {
-                LinearProgressIndicator(
-                    progress = { file.progressPercent / 100f },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp)
-                        .align(Alignment.BottomCenter),
-                    color = TVPrimary,
-                    trackColor = TVProgressBackground
-                )
-            }
-
-            // Hover overlay: title + genre fade in over the cover, on focus.
-            // Sized to a fixed fraction of the card (not wrap-content) so a
-            // two-line title plus a genre line always has guaranteed room,
-            // regardless of how long the text is.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.48f)
-                    .align(Alignment.BottomCenter)
-                    .alpha(overlayAlpha)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f))
-                        )
-                    )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 18.dp, end = 18.dp, bottom = 18.dp)
-                ) {
-                    Text(
-                        text = file.displayTitle,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = TVTextPrimary,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    val genre = file.primaryGenre
-                    if (genre != null) {
-                        Text(
-                            text = genre,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TVPrimaryLight,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * TV-optimized folder poster card ("Destaques"/"Recentes" rows) — same
- * cover-only + hover-overlay layout as [MediaCard] but for a title folder
- * (movie/show), matching the web app's Mídia page which shows folders, not
- * files, in these rows.
+ * TV-optimized folder poster card ("Destaques"/"Recentes" rows) — a
+ * cover-only poster (2:3) with title/genre as a fade-in overlay on focus,
+ * matching the web app's Mídia page which shows folders, not files, in
+ * these rows. File cards use the landscape [LargeMediaCard] design instead.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -318,10 +182,10 @@ private fun FileTypeBadge(
 }
 
 /**
- * Large media card variant for featured content ("Voltar a Ver") — kept as
- * the original landscape thumbnail with overlaid title/metadata. Like
- * [MediaCard]/[FolderPosterCard], only the image scales on focus — the
- * card's own bounds, the gradient overlay, badge and progress bar stay put.
+ * Landscape file card with overlaid title/metadata — used everywhere a
+ * file shows as a card (Voltar a Ver, folder browsing, search results).
+ * Like [FolderPosterCard], only the image scales on focus — the card's own
+ * bounds, the gradient overlay, badge and progress bar stay put.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

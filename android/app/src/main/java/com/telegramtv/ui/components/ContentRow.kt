@@ -14,8 +14,9 @@ import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.theme.TVTextPrimary
 
 /**
- * Horizontal content row for the home screen.
- * Displays a title and horizontally scrolling items.
+ * Horizontal content row for the home screen ("Voltar a Ver"). Always uses
+ * the landscape [LargeMediaCard] design — every file card in the app looks
+ * the same way now, not just this row.
  */
 @Composable
 fun ContentRow(
@@ -23,24 +24,28 @@ fun ContentRow(
     files: List<FileItem>,
     serverUrl: String,
     onFileClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    useLargeCards: Boolean = false
+    modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        // Row title
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            color = TVTextPrimary,
-            modifier = Modifier.padding(start = 48.dp, bottom = 16.dp)
-        )
+        // Row title — only rendered when the caller actually wants an
+        // inline title (HomeScreen's own ContentSection header covers this
+        // normally, and passes "").
+        if (title.isNotBlank()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = TVTextPrimary,
+                modifier = Modifier.padding(start = 48.dp, bottom = 16.dp)
+            )
+        }
 
         // Horizontal scrollable items. Cards cast a shadow on focus, so
-        // rows get extra breathing room — both between cards and above/
-        // below the row — to avoid looking cramped when that happens.
+        // rows get extra breathing room below to avoid looking cramped —
+        // the top only needs a little, since the section title above
+        // already provides separation.
         TvLazyRow(
-            contentPadding = PaddingValues(horizontal = 48.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(if (useLargeCards) 28.dp else 24.dp)
+            contentPadding = PaddingValues(start = 48.dp, end = 48.dp, top = 4.dp, bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             items(files, key = { it.id }) { file ->
                 // Prefer the API's own resolved thumbnail_url (covers a
@@ -48,20 +53,12 @@ fun ContentRow(
                 // the plain stream endpoint for older responses without it.
                 val thumbnailUrl = file.thumbnailUrl?.let { "$serverUrl$it" }
                     ?: "$serverUrl/api/stream/${file.id}/thumbnail"
-                
-                if (useLargeCards) {
-                    LargeMediaCard(
-                        file = file,
-                        thumbnailUrl = thumbnailUrl,
-                        onClick = { onFileClick(file.id) }
-                    )
-                } else {
-                    MediaCard(
-                        file = file,
-                        thumbnailUrl = thumbnailUrl,
-                        onClick = { onFileClick(file.id) }
-                    )
-                }
+
+                LargeMediaCard(
+                    file = file,
+                    thumbnailUrl = thumbnailUrl,
+                    onClick = { onFileClick(file.id) }
+                )
             }
         }
     }
@@ -81,15 +78,17 @@ fun FolderPosterRow(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            color = TVTextPrimary,
-            modifier = Modifier.padding(start = 48.dp, bottom = 16.dp)
-        )
+        if (title.isNotBlank()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = TVTextPrimary,
+                modifier = Modifier.padding(start = 48.dp, bottom = 16.dp)
+            )
+        }
 
         TvLazyRow(
-            contentPadding = PaddingValues(horizontal = 48.dp, vertical = 16.dp),
+            contentPadding = PaddingValues(start = 48.dp, end = 48.dp, top = 4.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             items(items, key = { it.folder.id }) { item ->

@@ -97,17 +97,12 @@ fun HomeScreen(
                         // Continue Watching section
                         if (uiState.continueWatching.isNotEmpty()) {
                             item {
-                                ContentSection(
-                                    title = "Voltar a Ver",
-                                    subtitle = "${uiState.continueWatching.size} em andamento",
-                                    icon = Icons.Default.PlayCircle
-                                ) {
+                                ContentSection(title = "Voltar a Ver") {
                                     ContentRow(
                                         title = "",
                                         files = uiState.continueWatching,
                                         serverUrl = uiState.serverUrl,
-                                        onFileClick = onFileClick,
-                                        useLargeCards = true
+                                        onFileClick = onFileClick
                                     )
                                 }
                             }
@@ -143,11 +138,7 @@ fun HomeScreen(
                         // pooling logic as the web app's Mídia landing page.
                         if (uiState.featuredFolders.isNotEmpty()) {
                             item {
-                                ContentSection(
-                                    title = "Destaques",
-                                    subtitle = "Em destaque na Mídia",
-                                    icon = Icons.Default.Star
-                                ) {
+                                ContentSection(title = "Destaques") {
                                     FolderPosterRow(
                                         title = "",
                                         items = uiState.featuredFolders,
@@ -161,11 +152,7 @@ fun HomeScreen(
                         // Recentes section — Mídia title folders (not files).
                         if (uiState.recentFolders.isNotEmpty()) {
                             item {
-                                ContentSection(
-                                    title = "Recentes",
-                                    subtitle = "Últimos adicionados",
-                                    icon = Icons.Default.Schedule
-                                ) {
+                                ContentSection(title = "Recentes") {
                                     FolderPosterRow(
                                         title = "",
                                         items = uiState.recentFolders,
@@ -333,65 +320,27 @@ private fun ModernActionButton(
 }
 
 /**
- * Content section with header.
+ * Content section with header — just the title, tightly spaced above the
+ * cards below it.
  */
 @Composable
 private fun ContentSection(
     title: String,
-    subtitle: String,
-    icon: ImageVector,
     content: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier.padding(top = 16.dp)
     ) {
-        // Section header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Accent line
-            Box(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(24.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(TVPrimary)
-            )
-            
-            Spacer(modifier = Modifier.width(12.dp))
-            
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = TVPrimary.copy(alpha = 0.8f),
-                modifier = Modifier.size(18.dp)
-            )
-            
-            Spacer(modifier = Modifier.width(10.dp))
-            
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = TVTextPrimary,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    letterSpacing = 0.sp
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TVTextSecondary.copy(alpha = 0.5f),
-                    fontSize = 11.sp
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = TVTextPrimary,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            letterSpacing = 0.sp,
+            modifier = Modifier.padding(horizontal = 40.dp, bottom = 26.dp)
+        )
+
         content()
     }
 }

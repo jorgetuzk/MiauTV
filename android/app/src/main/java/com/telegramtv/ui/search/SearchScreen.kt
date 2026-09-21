@@ -87,9 +87,12 @@ fun SearchScreen(
                         modifier = Modifier.padding(horizontal = 48.dp, vertical = 8.dp)
                     )
 
-                    // Results grid
+                    // Results grid. File cards use the same landscape design
+                    // as Voltar a Ver's LargeMediaCard, so the grid columns
+                    // are sized for that (320dp) instead of the narrower
+                    // poster width.
                     TvLazyVerticalGrid(
-                        columns = TvGridCells.Adaptive(200.dp),
+                        columns = TvGridCells.Adaptive(320.dp),
                         modifier = Modifier
                             .fillMaxSize()
                             .focusRequester(gridFocus),
@@ -107,7 +110,7 @@ fun SearchScreen(
                         }
                         items(uiState.results, key = { it.id }) { file ->
                             val thumbnailUrl = "${uiState.serverUrl}/api/stream/${file.id}/thumbnail"
-                            MediaCard(
+                            LargeMediaCard(
                                 file = file,
                                 thumbnailUrl = thumbnailUrl,
                                 onClick = { onFileClick(file.id) }

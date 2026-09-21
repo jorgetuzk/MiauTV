@@ -61,9 +61,12 @@ fun FolderScreen(
                         onBackClick = onBackClick
                     )
 
-                    // Content grid
+                    // Content grid. File cards are the same landscape design
+                    // as Voltar a Ver's LargeMediaCard, so the grid columns
+                    // are sized for that (320dp) instead of the narrower
+                    // poster width.
                     TvLazyVerticalGrid(
-                        columns = TvGridCells.Adaptive(200.dp),
+                        columns = TvGridCells.Adaptive(320.dp),
                         modifier = Modifier
                             .fillMaxSize()
                             .focusRequester(focusRequester),
@@ -82,7 +85,7 @@ fun FolderScreen(
                         // Then files
                         items(uiState.files, key = { "file_${it.id}" }) { file ->
                             val thumbnailUrl = "${uiState.serverUrl}/api/stream/${file.id}/thumbnail"
-                            MediaCard(
+                            LargeMediaCard(
                                 file = file,
                                 thumbnailUrl = thumbnailUrl,
                                 onClick = { onFileClick(file.id) }
