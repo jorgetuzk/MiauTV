@@ -338,7 +338,7 @@ private fun ContentSection(
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             letterSpacing = 0.sp,
-            modifier = Modifier.padding(horizontal = 40.dp, bottom = 26.dp)
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp, bottom = 26.dp)
         )
 
         content()
