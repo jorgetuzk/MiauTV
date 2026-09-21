@@ -35,16 +35,12 @@ fun ContentRow(
             modifier = Modifier.padding(start = 48.dp, bottom = 16.dp)
         )
 
-        // Horizontal scrollable items. The large (Voltar a Ver) cards scale
-        // up and cast a shadow on focus, so they get extra breathing room —
-        // both between cards and above/below the row — to avoid looking
-        // cramped when that happens.
+        // Horizontal scrollable items. Cards cast a shadow on focus, so
+        // rows get extra breathing room — both between cards and above/
+        // below the row — to avoid looking cramped when that happens.
         TvLazyRow(
-            contentPadding = if (useLargeCards)
-                PaddingValues(horizontal = 48.dp, vertical = 16.dp)
-            else
-                PaddingValues(horizontal = 48.dp),
-            horizontalArrangement = Arrangement.spacedBy(if (useLargeCards) 28.dp else 16.dp)
+            contentPadding = PaddingValues(horizontal = 48.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(if (useLargeCards) 28.dp else 24.dp)
         ) {
             items(files, key = { it.id }) { file ->
                 // Prefer the API's own resolved thumbnail_url (covers a
@@ -93,8 +89,8 @@ fun FolderPosterRow(
         )
 
         TvLazyRow(
-            contentPadding = PaddingValues(horizontal = 48.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(horizontal = 48.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             items(items, key = { it.folder.id }) { item ->
                 val thumbnailUrl = item.coverUrl?.let { "$serverUrl$it" }

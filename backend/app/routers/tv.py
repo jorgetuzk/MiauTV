@@ -58,6 +58,52 @@ async def _resolve_midia_folder_ids(db: AsyncSession, user_id: int) -> List[int]
     return list(midia_folders.scalars().all())
 
 
+async def _resolve_midia_type_tree_ids(db: AsyncSession, user_id: int) -> List[int]:
+    """Mídia's own content-type id plus its direct children's (Filmes/
+    Séries/Animes/...) — used to tell a subtype folder that's still
+    genuinely part of Mídia from one that's been retagged to a different
+    top-level type (e.g. "xHot" edited to carry the Hot type) via "Editar
+    Info", even though it still physically sits inside the Mídia folder."""
+    midia_type = await db.execute(
+        select(ContentType.id).where(
+            ContentType.user_id == user_id,
+            ContentType.parent_id.is_(None),
+            ContentType.slug == "midia",
+        )
+    )
+    midia_type_id = midia_type.scalar_one_or_none()
+    if midia_type_id is None:
+        return []
+
+    children = await db.execute(
+        select(ContentType.id).where(ContentType.user_id == user_id, ContentType.parent_id == midia_type_id)
+    )
+    return [midia_type_id] + list(children.scalars().all())
+
+
+async def _resolve_hidden_subtype_ids(db: AsyncSession, user_id: int, midia_folder_ids: List[int]) -> List[int]:
+    """Subtype folders (direct children of the Mídia root) whose own
+    content_type_id has been set to something outside Mídia's type tree —
+    they still show up as a Menu 1 pill (so they're reachable), but their
+    content stays out of the pooled "Visão geral" overview, Continue
+    Watching and search until that specific pill is selected."""
+    if not midia_folder_ids:
+        return []
+    midia_type_tree_ids = await _resolve_midia_type_tree_ids(db, user_id)
+    if not midia_type_tree_ids:
+        return []
+
+    hidden = await db.execute(
+        select(Folder.id).where(
+            Folder.user_id == user_id,
+            Folder.parent_id.in_(midia_folder_ids),
+            Folder.content_type_id.is_not(None),
+            Folder.content_type_id.notin_(midia_type_tree_ids),
+        )
+    )
+    return list(hidden.scalars().all())
+
+
 async def _build_subtype_pills(db: AsyncSession, root_ids: List[int]) -> List[CategoryOverviewFolder]:
     """Direct children of `root_ids` (the Mídia root folder(s)) — the
     category pill menu itself (Séries/Filmes/Animes/Hot). item_count is how
@@ -133,10 +179,26 @@ async def tv_browse(
     flat folder list (kept for backward compat, the TV client no longer
     renders it). Optimized for TV client to minimize API calls.
     """
+    from .content_types import _recursive_folder_ids
     from .folders import build_media_folder_overview
 
-    # Get continue watching
+    # The subtype folders themselves (Séries/Filmes/Animes/Hot) — the
+    # category pill menu ("Menu 1"). Always the full unfiltered set,
+    # regardless of which one is currently selected, so a retagged subtype
+    # (e.g. "xHot" edited to carry the Hot type) is still reachable there.
+    midia_folder_ids = await _resolve_midia_folder_ids(db, current_user.id)
+    subtype_folders = await _build_subtype_pills(db, midia_folder_ids)
+
+    # Subtypes retagged to a different top-level type stay out of the
+    # pooled "Visão geral" view and Continue Watching by default — only
+    # showing up once their own Menu 1 pill is selected.
+    hidden_subtype_ids = await _resolve_hidden_subtype_ids(db, current_user.id, midia_folder_ids)
+    hidden_tree_ids = set(await _recursive_folder_ids(db, hidden_subtype_ids)) if hidden_subtype_ids else set()
+
+    # Get continue watching, filtering out anything inside a hidden subtype
     continue_watching = await fetch_continue_watching_files(db, current_user.id, 20)
+    if hidden_tree_ids:
+        continue_watching = [f for f in continue_watching if f.folder_id not in hidden_tree_ids]
 
     # Get recent files
     recent_files = await fetch_recent_files(db, current_user.id, 20)
@@ -150,18 +212,17 @@ async def tv_browse(
     folders_result = await db.execute(folders_query)
     folders = folders_result.scalars().all()
 
-    # The subtype folders themselves (Séries/Filmes/Animes/Hot) — the
-    # category pill menu ("Menu 1"). Always the full unfiltered set,
-    # regardless of which one is currently selected.
-    midia_folder_ids = await _resolve_midia_folder_ids(db, current_user.id)
-    subtype_folders = await _build_subtype_pills(db, midia_folder_ids)
-
     # Mídia titles (movie/show folders) for the Destaques/Recentes rows —
-    # pooled across every subtype by default, or scoped to a single one
-    # (type_id) when a category pill is selected. genre/sort passed through
-    # the same way the web app's Mídia page does.
+    # pooled across every non-hidden subtype by default, or scoped to a
+    # single one (type_id) when a category pill is selected — selecting a
+    # hidden subtype's own pill still works, that's the "only appears if
+    # you click Menu 1" escape hatch. genre/sort passed through the same
+    # way the web app's Mídia page does.
     subtype_ids = await _resolve_midia_subtype_folder_ids(db, current_user.id)
-    scope_ids = [type_id] if (type_id is not None and type_id in subtype_ids) else subtype_ids
+    if type_id is not None and type_id in subtype_ids:
+        scope_ids = [type_id]
+    else:
+        scope_ids = [sid for sid in subtype_ids if sid not in hidden_subtype_ids]
 
     featured_folders = []
     recent_folders = []
@@ -225,11 +286,18 @@ async def tv_search(
     reliably carry their own content_type_id — see resolve_category_
     breadcrumb); folder results are titles (movie/show folders), matched by
     name/title/genre, with the same cover/count enrichment as Destaques/
-    Recentes so the search result cards look identical to them."""
+    Recentes so the search result cards look identical to them. Subtypes
+    retagged to a different top-level type (see _resolve_hidden_subtype_ids)
+    are left out — search has no per-category scoping on TV, so there's no
+    "click Menu 1" escape hatch here; they just stay hidden."""
     from .content_types import _recursive_folder_ids
     from .folders import build_media_folder_overview
 
-    subtype_ids = await _resolve_midia_subtype_folder_ids(db, current_user.id)
+    midia_folder_ids = await _resolve_midia_folder_ids(db, current_user.id)
+    hidden_subtype_ids = set(await _resolve_hidden_subtype_ids(db, current_user.id, midia_folder_ids))
+
+    all_subtype_ids = await _resolve_midia_subtype_folder_ids(db, current_user.id)
+    subtype_ids = [sid for sid in all_subtype_ids if sid not in hidden_subtype_ids]
     if not subtype_ids:
         return {"files": [], "folders": []}
 

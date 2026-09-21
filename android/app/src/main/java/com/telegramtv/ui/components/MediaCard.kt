@@ -133,7 +133,7 @@ fun MediaCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.42f)
+                    .fillMaxHeight(0.48f)
                     .align(Alignment.BottomCenter)
                     .alpha(overlayAlpha)
                     .background(
@@ -145,7 +145,7 @@ fun MediaCard(
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                        .padding(start = 18.dp, end = 18.dp, bottom = 18.dp)
                 ) {
                     Text(
                         text = file.displayTitle,
@@ -238,7 +238,7 @@ fun FolderPosterCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.42f)
+                    .fillMaxHeight(0.48f)
                     .align(Alignment.BottomCenter)
                     .alpha(overlayAlpha)
                     .background(
@@ -250,7 +250,7 @@ fun FolderPosterCard(
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                        .padding(start = 18.dp, end = 18.dp, bottom = 18.dp)
                 ) {
                     Text(
                         text = item.folder.displayTitle,
