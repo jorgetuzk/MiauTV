@@ -68,6 +68,10 @@ fun FolderPosterCard(
 
     Card(
         onClick = onClick,
+        // Zoom is handled manually via imageScale below (image only).
+        // Disabling the Card's own built-in focus scale prevents it from
+        // stacking on top of imageScale and cramping the text padding.
+        scale = CardDefaults.scale(focusedScale = 1f),
         modifier = modifier
             .width(160.dp)
             .aspectRatio(2f / 3f)
@@ -207,6 +211,10 @@ fun LargeMediaCard(
 
     Card(
         onClick = onClick,
+        // Zoom is handled manually via imageScale below (image only).
+        // Disabling the Card's own built-in focus scale prevents it from
+        // stacking on top of imageScale and cramping the text padding.
+        scale = CardDefaults.scale(focusedScale = 1f),
         modifier = modifier
             .width(320.dp)
             .height(220.dp)
