@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.telegramtv.data.model.FileItem
 import com.telegramtv.data.repository.AuthRepository
 import com.telegramtv.ui.auth.LoginScreen
 import com.telegramtv.ui.browse.FolderScreen
@@ -29,6 +30,14 @@ fun NavGraph(
     
     val startDestination = if (isLoggedIn) Screen.Home.route else Screen.Login.route
 
+    // Clicking a file card jumps straight into playback — resuming from
+    // its last watch progress (in seconds) when there is one — instead of
+    // going through the Details screen first.
+    val playFile: (FileItem) -> Unit = { file ->
+        val startPositionMs = (file.watchProgress ?: 0) * 1000L
+        navController.navigate(Screen.Player.createRoute(file.id, startPositionMs))
+    }
+
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -47,9 +56,7 @@ fun NavGraph(
         // Home Screen
         composable(Screen.Home.route) {
             HomeScreen(
-                onFileClick = { fileId ->
-                    navController.navigate(Screen.Details.createRoute(fileId))
-                },
+                onFileClick = playFile,
                 onFolderClick = { folderId ->
                     navController.navigate(Screen.Folder.createRoute(folderId))
                 },
@@ -70,9 +77,7 @@ fun NavGraph(
             )
         ) {
             FolderScreen(
-                onFileClick = { fileId ->
-                    navController.navigate(Screen.Details.createRoute(fileId))
-                },
+                onFileClick = playFile,
                 onFolderClick = { subFolderId ->
                     navController.navigate(Screen.Folder.createRoute(subFolderId))
                 },
@@ -119,9 +124,7 @@ fun NavGraph(
         // Search Screen
         composable(Screen.Search.route) {
             SearchScreen(
-                onFileClick = { fileId ->
-                    navController.navigate(Screen.Details.createRoute(fileId))
-                },
+                onFileClick = playFile,
                 onFolderClick = { folderId ->
                     navController.navigate(Screen.Folder.createRoute(folderId))
                 },

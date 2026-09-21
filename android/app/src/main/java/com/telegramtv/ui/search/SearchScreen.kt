@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.foundation.lazy.grid.TvGridCells
 import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
 import androidx.tv.foundation.lazy.grid.items
+import com.telegramtv.data.model.FileItem
 import com.telegramtv.ui.components.*
 import com.telegramtv.ui.theme.*
 
@@ -29,7 +30,7 @@ import com.telegramtv.ui.theme.*
  */
 @Composable
 fun SearchScreen(
-    onFileClick: (Int) -> Unit,
+    onFileClick: (FileItem) -> Unit,
     onFolderClick: (Int) -> Unit,
     onBackClick: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
@@ -113,7 +114,7 @@ fun SearchScreen(
                             LargeMediaCard(
                                 file = file,
                                 thumbnailUrl = thumbnailUrl,
-                                onClick = { onFileClick(file.id) }
+                                onClick = { onFileClick(file) }
                             )
                         }
                     }

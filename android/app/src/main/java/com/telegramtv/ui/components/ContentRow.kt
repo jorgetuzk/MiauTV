@@ -23,7 +23,7 @@ fun ContentRow(
     title: String,
     files: List<FileItem>,
     serverUrl: String,
-    onFileClick: (Int) -> Unit,
+    onFileClick: (FileItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -57,7 +57,7 @@ fun ContentRow(
                 LargeMediaCard(
                     file = file,
                     thumbnailUrl = thumbnailUrl,
-                    onClick = { onFileClick(file.id) }
+                    onClick = { onFileClick(file) }
                 )
             }
         }

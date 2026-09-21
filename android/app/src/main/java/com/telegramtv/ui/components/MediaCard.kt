@@ -237,11 +237,12 @@ fun LargeMediaCard(
                 contentScale = ContentScale.Crop
             )
 
-            // Gradient overlay
+            // Gradient overlay — same fraction-of-card sizing as
+            // FolderPosterCard's hover overlay, instead of a fixed height.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(110.dp)
+                    .fillMaxHeight(0.48f)
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
@@ -261,11 +262,12 @@ fun LargeMediaCard(
                     .padding(10.dp)
             )
 
-            // File info
+            // File info — same internal padding as FolderPosterCard's
+            // overlay text.
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(16.dp)
+                    .padding(start = 18.dp, end = 18.dp, bottom = 18.dp)
             ) {
                 Text(
                     text = file.fileName,

@@ -33,6 +33,7 @@ import androidx.tv.foundation.lazy.list.items
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import com.telegramtv.data.model.FileItem
 import com.telegramtv.data.model.GenreCount
 import com.telegramtv.data.model.MediaFolderCardItem
 import com.telegramtv.ui.components.*
@@ -43,7 +44,7 @@ import com.telegramtv.ui.theme.*
  */
 @Composable
 fun HomeScreen(
-    onFileClick: (Int) -> Unit,
+    onFileClick: (FileItem) -> Unit,
     onFolderClick: (Int) -> Unit,
     onSearchClick: () -> Unit,
     onSettingsClick: () -> Unit,
